@@ -47,3 +47,18 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Data files
+*.xlsx
+*.csv
+
+# Add project file to the .gitignore
+*.Rproj
+
+# Ignore certain image file types
+*.tiff
+*.png
+
+# Ignore synchrony figure folder
+synchrony_figure_files/
+map_data/
