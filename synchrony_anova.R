@@ -17,14 +17,16 @@ librarian::shelf(googledrive, tidyverse, RRPP)
 # Clear environment
 rm(list = ls())
 
-# Download prepared data
+# Identify prepared data
 ## See "synchrony_data_prep.R" for how this file is created
-googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
-  dplyr::filter(name == "synchrony_data.csv") %>%
-  googledrive::drive_download(., overwrite = T)
+sync_file <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
+  dplyr::filter(name == "synchrony_data.csv")
+
+# Download it
+googledrive::drive_download(file = sync_file$id, path = file.path("tidy_data", sync_file$name), overwrite = T)
 
 # Read in that file
-sync_df <- read.csv(file = "synchrony_data.csv") %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_data.csv")) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1)
@@ -37,6 +39,9 @@ export_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/
 
 # Check its current contents
 googledrive::drive_ls(export_folder)
+
+# Create a local folder for exporting results to
+dir.create(path = file.path("stats_results"), showWarnings = F)
 
 # Set permutation number
 iter_num <- 10000
@@ -357,12 +362,12 @@ dplyr::glimpse(pairs_df)
 (pairs_name <- paste0("ANOVA_trait_pairwise_comps_", Sys.Date(), "_", iter_num, "perm.csv"))
 
 # Export both locally
-write.csv(x = aov_df, file = file.path(aov_name), row.names = F, na = '')
-write.csv(x = pairs_df, file = file.path(pairs_name), row.names = F, na = '')
+write.csv(x = aov_df, file = file.path("stats_results", aov_name), row.names = F, na = '')
+write.csv(x = pairs_df, file = file.path("stats_results", pairs_name), row.names = F, na = '')
 
 # Upload both to Google Drive
-googledrive::drive_upload(media = file.path(aov_name), path = export_folder, overwrite = T)
-googledrive::drive_upload(media = file.path(pairs_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", aov_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", pairs_name), path = export_folder, overwrite = T)
 
 # Clean up environment
 rm(list = setdiff(ls(), c("sync_df", "export_folder", "iter_num")))
@@ -683,12 +688,12 @@ dplyr::glimpse(stat_pair_df)
 (stat_pair_name <- paste0("ANOVA_trait_status_pairwise_comps_", Sys.Date(), "_", iter_num, "perm.csv"))
 
 # Export both locally
-write.csv(x = stat_df, file = file.path(stat_name), row.names = F, na = '')
-write.csv(x = stat_pair_df, file = file.path(stat_pair_name), row.names = F, na = '')
+write.csv(x = stat_df, file = file.path("stats_results", stat_name), row.names = F, na = '')
+write.csv(x = stat_pair_df, file = file.path("stats_results", stat_pair_name), row.names = F, na = '')
 
 # Upload both to Google Drive
-googledrive::drive_upload(media = file.path(stat_name), path = export_folder, overwrite = T)
-googledrive::drive_upload(media = file.path(stat_pair_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", stat_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", stat_pair_name), path = export_folder, overwrite = T)
 
 # Clean up environment
 rm(list = setdiff(ls(), c("sync_df", "export_folder", "iter_num")))
