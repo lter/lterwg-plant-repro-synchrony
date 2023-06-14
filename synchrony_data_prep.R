@@ -51,15 +51,18 @@ purrr::walk2(.x = wanted_files$id,
                                                 path = file.path("source_data", .y),
                                                 overwrite = T))
 
+# Make a folder to export processed data in
+dir.create(path = file.path("tidy_data"), showWarnings = F)
+
 ## ------------------------------------------ ##
           # Prepare to Merge Data ----
 ## ------------------------------------------ ##
 
 # Read in pairwise correlations
-pair_cor <- read.csv("pairwise_corr.csv")
+pair_cor <- read.csv(file = file.path("source_data", "pairwise_corr.csv"))
 
 # Read in summary statistics
-mast_summary <- read.csv("masting_summary_stats.csv")
+mast_summary <- read.csv(file = file.path("source_data", "masting_summary_stats.csv"))
 
 # Simplify the mast summary statistics
 mast_v2 <- mast_summary %>%
@@ -70,7 +73,7 @@ mast_v2 <- mast_summary %>%
 dplyr::glimpse(mast_v2)
 
 # Read in the relevant CSV of traits
-traits <- read.csv("LTER_integrated_attributes_USDA_2022-12-14.csv")
+traits <- read.csv(file = file.path("source_data", "LTER_integrated_attributes_USDA_2022-12-14.csv"))
 #Note: 29 March 2023 - The seed mass for Eugenia stahill was changed to 4651 mg (Source: Francis and Rodriguez, 1993): rn_so374.pdf (usda.gov)
 
 # Wrangle traits data
@@ -99,7 +102,7 @@ traits_v2 <- traits %>%
 dplyr::glimpse(traits_v2)
 
 # Read in phylogenetic data
-phylo <- read.csv("phylo distance matrix.csv")
+phylo <- read.csv(file = file.path("source_data", "phylo distance matrix.csv"))
 
 # Wrangle phylogenetic data
 phylo_v2 <- phylo %>%
@@ -281,11 +284,11 @@ sync_df$TraitSimilarityJaccardVariant <- rowSums(sync_df[,10:21])/12
 dplyr::glimpse(sync_df)
 
 # Export locally
-write.csv(x = sync_df, file = file.path("synchrony_data.csv"),
+write.csv(x = sync_df, file = file.path("tidy_data", "synchrony_data.csv"),
           row.names = F, na = '')
 
 # Upload this to the Drive
-googledrive::drive_upload(media = file.path("synchrony_data.csv"),
+googledrive::drive_upload(media = file.path("tidy_data", "synchrony_data.csv"),
                           path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"),
                           overwrite = TRUE)
 
