@@ -34,13 +34,13 @@ stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1
   dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file)))
 
 # Create folder to download files into
-dir.create(path = file.path("synchrony_data"), showWarnings = F)
+dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, 
              .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("synchrony_data", .y),
+                                                path = file.path("figure_data", .y),
                                                 overwrite = T))
 
 ## ------------------------------------------ ##
@@ -48,7 +48,7 @@ purrr::walk2(.x = wanted_files$id,
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("synchrony_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1) %>%
@@ -64,7 +64,7 @@ sync_df <- read.csv(file = file.path("synchrony_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in trait information
-spp_traits <- read.csv(file = file.path("synchrony_data", trait_file)) %>%
+spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
   # Pivot to long format
   tidyr::pivot_longer(cols = -lter:-Species.Name,
                       names_to = "trait", values_to = "trait_value") %>%
@@ -110,7 +110,7 @@ spp_traits <- read.csv(file = file.path("synchrony_data", trait_file)) %>%
 dplyr::glimpse(spp_traits)
 
 # Read in permutations of correlations
-perm_df <- read.csv(file = file.path("synchrony_data", perm_file)) %>%
+perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
   # Cut off below overlap threshold
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
@@ -125,7 +125,7 @@ perm_df <- read.csv(file = file.path("synchrony_data", perm_file)) %>%
 dplyr::glimpse(perm_df)
 
 # Read in MRM results
-mrm_results <- read.csv(file = file.path("synchrony_data", mrm_file)) %>%
+mrm_results <- read.csv(file = file.path("figure_data", mrm_file)) %>%
   # Drop all but saturated model
   dplyr::filter(model == "saturated model" & coef != "Int") %>%
   # Make coefficient column match trait name
@@ -175,8 +175,8 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 
 # Read in data
 ## NOTE: Need to eventually change to download directly from Google Drive
-and_df <- read.csv(file.path("synchrony_data", "andrew.csv"))
-bnz_df <- read.csv(file.path("synchrony_data", "bonanza.csv"))
+and_df <- read.csv(file.path("figure_data", "andrew.csv"))
+bnz_df <- read.csv(file.path("figure_data", "bonanza.csv"))
 
 # Wrangle Andrews data
 and_v2 <- and_df %>%

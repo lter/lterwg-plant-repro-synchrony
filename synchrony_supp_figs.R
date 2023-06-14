@@ -42,13 +42,13 @@ wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
 wanted_files
 
 # Create folder to download files into
-dir.create(path = file.path("synchrony_data"), showWarnings = F)
+dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, 
              .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("synchrony_data", .y),
+                                                path = file.path("figure_data", .y),
                                                 overwrite = T))
 
 ## ------------------------------------------ ##
@@ -56,7 +56,7 @@ purrr::walk2(.x = wanted_files$id,
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("synchrony_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1) %>%
@@ -67,7 +67,7 @@ sync_df <- read.csv(file = file.path("synchrony_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in trait information
-spp_traits <- read.csv(file = file.path("synchrony_data", trait_file)) %>%
+spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
   # Pivot to long format
   tidyr::pivot_longer(cols = -lter:-Species.Name,
                       names_to = "trait", values_to = "trait_value") %>%
@@ -113,7 +113,7 @@ spp_traits <- read.csv(file = file.path("synchrony_data", trait_file)) %>%
 dplyr::glimpse(spp_traits)
 
 # Read in permutations of correlations
-perm_df <- read.csv(file = file.path("synchrony_data", perm_file)) %>%
+perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
   # Cut off below overlap threshold
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
@@ -123,7 +123,7 @@ perm_df <- read.csv(file = file.path("synchrony_data", perm_file)) %>%
 dplyr::glimpse(perm_df)
 
 # Read in MRM results
-mrm_results <- read.csv(file = file.path("synchrony_data", mrm_file)) %>%
+mrm_results <- read.csv(file = file.path("figure_data", mrm_file)) %>%
   # Drop all but saturated model
   dplyr::filter(model == "saturated model" & coef != "Int") %>%
   # Make coefficient column match trait name
@@ -143,7 +143,7 @@ mrm_results <- read.csv(file = file.path("synchrony_data", mrm_file)) %>%
 dplyr::glimpse(mrm_results)
 
 # Read in ANOVA results too
-aov_results <- read.csv(file = file.path("synchrony_data", aov_file)) %>%
+aov_results <- read.csv(file = file.path("figure_data", aov_file)) %>%
   # Remove unwanted rows
   dplyr::filter(!term %in% c("Residuals", "Total")) %>%
   # Pare down to minimum needed columns
@@ -176,7 +176,7 @@ aov_results <- read.csv(file = file.path("synchrony_data", aov_file)) %>%
 dplyr::glimpse(aov_results)
 
 # Read in pairwise comparisons results
-aov_pairs <- read.csv(file = file.path("synchrony_data", pair_file)) %>%
+aov_pairs <- read.csv(file = file.path("figure_data", pair_file)) %>%
   # Pare down to minimum needed columns
   dplyr::select(lter, model, pairs, P) %>%
   # Get to unique rows only
@@ -252,7 +252,7 @@ aov_cld <- aov_cld_list %>%
 dplyr::glimpse(aov_cld)
 
 # Read in trait status ANOVA results too
-stat_aov <- read.csv(file.path("synchrony_data", stat_aov_file)) %>%
+stat_aov <- read.csv(file.path("figure_data", stat_aov_file)) %>%
   # Pare down to minimum needed columns
   dplyr::select(lter, term, P) %>%
   # Get to unique rows only
