@@ -301,15 +301,17 @@ rm(list = c("mast_summary", "mast_v2", "merge_cor", "pair_cor", "phylo",  "phylo
     # Synchrony + PCoA Diff Creation ----
 ## ------------------------------------------ ##
 
-# Download PCoA axis values CSV
-googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
+# Identify PCoA axis values in Drive
+pc_file <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
   # Filter to desired file
-  dplyr::filter(name == "trait_space_pcoa_axes.csv") %>%
-  # Download it
-  googledrive::drive_download(file = ., overwrite = T)
+  dplyr::filter(name == "trait_space_pcoa_axes.csv")
+
+# Download PCoA axis values CSV
+googledrive::drive_download(file = pc_file$id, overwrite = T, 
+                            path = file.path("source_data", pc_file$name))
 
 # Read in
-pc_axes <- read.csv(file.path("trait_space_pcoa_axes.csv"))
+pc_axes <- read.csv(file.path("source_data", "trait_space_pcoa_axes.csv"))
 
 # Check that out
 dplyr::glimpse(pc_axes)
@@ -328,11 +330,11 @@ pc_sync_df <- sync_df %>%
 dplyr::glimpse(pc_sync_df)
 
 # Export locally
-write.csv(pc_sync_df, file = file.path("synchrony_pcoa_combination.csv"), 
+write.csv(pc_sync_df, file = file.path("tidy_data", "synchrony_pcoa_combination.csv"), 
           row.names = F, na = '')
 
 # Upload to Drive
-googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("synchrony_pcoa_combination.csv"), overwrite = T)
+googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("tidy_data", "synchrony_pcoa_combination.csv"), overwrite = T)
 
 ## ------------------------------------------ ##
   # Synchrony + PCoA + Climate Creation ----
@@ -342,19 +344,27 @@ googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/dr
 clim_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1tPM28pofJbpKXod3rXq-QEqjxGcU8xgt"), type = "csv") %>%
   dplyr::filter(name %in% c("climateSites_tidy.csv", "plot_data_ClimateSites.csv"))
 
+
+clim_files
+
 # Download climate data and climate plot info
-purrr::walk(clim_files$id, ~ googledrive::drive_download(googledrive::as_id(.x), overwrite=T))
+purrr::walk2(.x = clim_files$id, .y = clim_files$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x),
+                                                path = file.path("source_data", .y),
+                                                overwrite = T))
 
 # Read in climate data
-clim <- read.csv("climateSites_tidy.csv") %>%
+clim <- read.csv(file.path("source_data", "climateSites_tidy.csv")) %>%
   # Pare down to desired columns
   dplyr::select(-X) %>%
-  dplyr::rename(lter=SiteCode)%>%
+  dplyr::rename(lter = SiteCode)%>%
   # Drop Adirondack
-  dplyr::filter(lter != "ADK")
+  dplyr::filter(lter != "ADK") %>%
+  # Remove duplicate rows (if any)
+  dplyr::distinct()
 
 # Read in special climate sites data
-clim_plots <- read.csv("plot_data_ClimateSites.csv") %>%
+clim_plots <- read.csv(file.path("source_data", "plot_data_ClimateSites.csv")) %>%
   # Rename site and plot columns
   dplyr::rename(lter = LTER.Site) %>%
   # Drop Adirondack
@@ -364,10 +374,13 @@ clim_plots <- read.csv("plot_data_ClimateSites.csv") %>%
                 supersite = dplyr::case_when(
                   lter == "LUQ" ~ "1",
                   lter == "CDR" ~ "CDR",
-                  TRUE ~ supersite
-                )) %>%
+                  TRUE ~ supersite)) %>%
   # Drop unwanted columns
-  dplyr::select(-SiteCode,-Plot.ID)
+  dplyr::select(-SiteCode, -Plot.ID) %>%
+  # Remove duplicate rows (if any)
+  dplyr::distinct() %>%
+  # Create an LTER specific plot ID column
+  dplyr::mutate(lter_plot = paste0(lter, "__", supersite))
   
 # Look at both
 dplyr::glimpse(clim)
@@ -376,9 +389,12 @@ dplyr::glimpse(pc_sync_df)
 
 # Merge climate plots with rest of (non-climate) data
 merged <- pc_sync_df %>%
+  # Create the LTER + plot column in the climate plot dataframe
+  dplyr::mutate(lter_plot = paste0(lter, "__", Plot.ID)) %>%
+  # Do the merging
   dplyr::left_join(y = clim_plots, 
-                   by = c("lter", "Plot.ID" = "supersite"), 
-                   multiple = "all")
+                   by = c("lter", "Plot.ID" = "supersite", "lter_plot"), 
+                   multiple = "all", relationship = "many-to-many")
 
 # Now combine *that* with the actual climate data
 pc_clim_sync_df <- merged %>%
@@ -397,10 +413,10 @@ pc_clim_sync_df <- merged %>%
 dplyr::glimpse(pc_clim_sync_df)
 
 # Export locally
-write.csv(pc_clim_sync_df, file = file.path("synchrony_pcoa_climate_combination.csv"), 
-          row.names = F, na = '')
+write.csv(pc_clim_sync_df, row.names = F, na = '',
+          file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv"))
 
 # Upload to Drive
-googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("synchrony_pcoa_climate_combination.csv"), overwrite = T)
+googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv"), overwrite = T)
 
 # End ----
