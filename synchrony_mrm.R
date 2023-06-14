@@ -18,14 +18,19 @@ librarian::shelf(googledrive, tidyverse, ecodist)
 # Clear environment
 rm(list = ls())
 
-# Download prepared data
+# Create tidy data folder if it doesn't exist
+dir.create(path = file.path("tidy_data"), showWarnings = F)
+
+# Identify prepared data
 ## See "synchrony_data_prep.R" for how this file is created
-googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
-  dplyr::filter(name == "synchrony_data.csv") %>%
-  googledrive::drive_download(., overwrite = T)
+sync_file <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
+  dplyr::filter(name == "synchrony_data.csv")
+
+# Download it
+googledrive::drive_download(file = sync_file$id, path = file.path("tidy_data", sync_file$name), overwrite = T)
 
 # Read in that file
-sync_df <- read.csv(file = "synchrony_data.csv") %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_data.csv")) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1)
@@ -67,19 +72,22 @@ dplyr::glimpse(pair_avg_df)
 nrow(sync_df) - nrow(pair_avg_df)
 
 # Export this to locally and to the Drive
-write.csv(x = pair_avg_df, file = file.path("synchrony_data_spp_averages.csv"), 
+write.csv(x = pair_avg_df, file = file.path("tidy_data", "synchrony_data_spp_averages.csv"), 
           row.names = F, na = '')
-googledrive::drive_upload(media = "synchrony_data_spp_averages.csv", overwrite = T,
+googledrive::drive_upload(media = file.path("tidy_data", "synchrony_data_spp_averages.csv"), overwrite = T,
                           path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"))
 
 # Identify output folder
-export_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
+stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Check its current contents
-googledrive::drive_ls(export_folder)
+googledrive::drive_ls(stats_drive)
 
 # Set permutation number
 perm_num <- 10000
+
+# Create a local folder for exporting results to
+dir.create(path = file.path("stats_results"), showWarnings = F)
 
 ## ------------------------------------------ ##
     # Helpful MRM Extraction Function ----
@@ -469,13 +477,13 @@ dplyr::glimpse(total_df)
 (file_name <- paste0("MRM_not_averaged_results_", Sys.Date(), "_", perm_num, "perm.csv"))
 
 # Export as a CSV locally
-write.csv(x = total_df, file = file.path(file_name), row.names = F, na = '')
+write.csv(x = total_df, file = file.path("stats_results", file_name), row.names = F, na = '')
 
 # Upload this CSV there
-googledrive::drive_upload(media = file.path(file_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
 
 # Clear environment of almost everything
-rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "export_folder", 
+rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "stats_drive", 
                           "perm_num", "mrm_extract")))
 
 ## ------------------------------------------ ##
@@ -765,13 +773,13 @@ dplyr::glimpse(sens_df)
 (file_name <- paste0("MRM_sensitivity_analyses_", Sys.Date(), "_", perm_num, "perm.csv"))
 
 # Export as a CSV locally
-write.csv(x = sens_df, file = file.path(file_name), row.names = F, na = '')
+write.csv(x = sens_df, file = file.path("stats_results", file_name), row.names = F, na = '')
 
 # Upload this CSV there
-googledrive::drive_upload(media = file.path(file_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
 
 # Clear environment of almost everything
-rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "export_folder", 
+rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "stats_drive", 
                           "perm_num", "mrm_extract")))
 
 # End ----
