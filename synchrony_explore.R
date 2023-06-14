@@ -16,14 +16,16 @@ librarian::shelf(googledrive, tidyverse, supportR, magrittr)
 # Clear environment
 rm(list = ls())
 
-# Download prepared data
+# Identify prepared data
 ## See "synchrony_data_prep.R" for how this file is created
-googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
-  dplyr::filter(name == "synchrony_data.csv") %>%
-  googledrive::drive_download(., overwrite = T)
+sync_file <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
+  dplyr::filter(name == "synchrony_data.csv")
+  
+# Download it
+googledrive::drive_download(file = sync_file$id, path = file.path("tidy_data", sync_file$name), overwrite = T)
 
 # Read in that file
-sync_df <- read.csv(file = "synchrony_data.csv") %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_data.csv")) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1)
@@ -32,11 +34,14 @@ sync_df <- read.csv(file = "synchrony_data.csv") %>%
 dplyr::glimpse(sync_df)
 
 # Identify folder to export plots to
-fig_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1TJxskD7obtZl7j8b51sbfJBMkNxEXkCN")
+explore_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1TJxskD7obtZl7j8b51sbfJBMkNxEXkCN")
 
 # Define color palette per site
 site_palette <- c("SEV" = "#c51b7d", "LUQ" = "#7fbc41", "HBR" = "#d73027", "CWT" = "#4575b4",
                   "CDR" = "#e08214", "BNZ" = "#8073ac", "AND" = "#f1b6da")
+
+# Create a folder to export exploratory graphs to
+dir.create(path = file.path("explore_graphs"), showWarnings = F)
 
 ## ------------------------------------------ ##
   # Correlation vs. Trait Levels Filtered ----
@@ -100,10 +105,11 @@ for(focal_trait in unique(combo_df$name)){
   plot_name <- paste("multi-site", focal_trait, "plot.png", sep = "_")
   
   # Save locally
-  ggsave(filename = plot_name, plot = last_plot(), width = 8, height = 6, units = "in")
+  ggsave(filename = file.path("explore_graphs", plot_name), plot = last_plot(), 
+         width = 8, height = 6, units = "in")
   
   # Export to Drive
-  googledrive::drive_upload(media = plot_name, path = fig_folder, overwrite = T) 
+  googledrive::drive_upload(media = file.path("explore_graphs", plot_name), path = explore_folder, overwrite = T) 
   
   # Completion message
   message("Finished with plots for ", focal_trait) }
@@ -173,10 +179,12 @@ for(focal_trait in unique(combo_df$name)){
   plot_name <- paste("multi-site", focal_trait, "Unfiltered_plot.png", sep = "_")
   
   # Save locally
-  ggsave(filename = plot_name, plot = last_plot(), width = 12, height = 6, units = "in")
+  ggsave(filename = file.path("explore_graphs", plot_name), plot = last_plot(), 
+         width = 12, height = 6, units = "in")
   
   # Export to Drive
-  googledrive::drive_upload(media = plot_name, path = fig_folder, overwrite = T) 
+  googledrive::drive_upload(media = file.path("explore_graphs", plot_name),
+                            path = explore_folder, overwrite = T) 
   
   # Completion message
   message("Finished with plots for ", focal_trait) }
@@ -245,10 +253,12 @@ for(focal_trait in unique(combo_df$name)){
   plot_name <- paste("multi-site", focal_trait, "plot.png", sep = "_")
   
   # Save locally
-  ggsave(filename = plot_name, plot = last_plot(), width = 7, height = 6, units = "in")
+  ggsave(filename = file.path("explore_graphs", plot_name), plot = last_plot(), 
+         width = 7, height = 6, units = "in")
   
   # Export to Drive
-  googledrive::drive_upload(media = plot_name, path = fig_folder, overwrite = T) 
+  googledrive::drive_upload(media = file.path("explore_graphs", plot_name),
+                            path = explore_folder, overwrite = T) 
   
   # Completion message
   message("Finished with plots for ", focal_trait) }
@@ -314,10 +324,11 @@ for(focal_trait in unique(exclude_df$name)){
   plot_name <- paste("multi-site", focal_trait, "site-exclusions_plot.png", sep = "_")
   
   # Save locally
-  ggsave(filename = plot_name, plot = last_plot(), width = 7, height = 6, units = "in")
+  ggsave(filename = file.path("explore_graphs", plot_name), plot = last_plot(),
+         width = 7, height = 6, units = "in")
   
   # Export to Drive
-  googledrive::drive_upload(media = plot_name, path = fig_folder, overwrite = T) 
+  googledrive::drive_upload(media = file.path("explore_graphs", plot_name), path = explore_folder, overwrite = T) 
   
   # Completion message
   message("Finished with plots for ", focal_trait) }
@@ -362,12 +373,12 @@ ggplot(simp_df, aes(x = as.factor(value), y = r.spearman, fill = sig_status)) +
   theme(legend.position = "right")
 
 # Save locally
-ggsave(filename = "saturated_model_all_data_w_significance.png",
+ggsave(filename = file.path("explore_graphs", "saturated_model_all_data_w_significance.png"),
        plot = last_plot(), width = 10, height = 10, units = "in")
 
 # Export to Drive
-googledrive::drive_upload(media = "saturated_model_all_data_w_significance.png", 
-                          path = fig_folder, overwrite = T) 
+googledrive::drive_upload(media = file.path("explore_graphs", "saturated_model_all_data_w_significance.png"), 
+                          path = explore_folder, overwrite = T) 
 
 ## ------------------------------------------ ##
               # Phylo Distance ----
@@ -391,7 +402,8 @@ ggplot(phy_simp, aes(x = Phylo_distance, y = r.spearman, fill = lter)) +
   theme_bw()
 
 # Export plot
-ggsave(filename = "spearman_vs_phylodist.png", height = 8, width = 10, units = "in")
+ggsave(filename = file.path("explore_graphs", "spearman_vs_phylodist.png"), 
+       height = 8, width = 10, units = "in")
   
 # Do the same for pearson distance
 ggplot(phy_simp, aes(x = Phylo_distance, y = r.pearson, fill = lter)) +
@@ -403,8 +415,6 @@ ggplot(phy_simp, aes(x = Phylo_distance, y = r.pearson, fill = lter)) +
   theme_bw()
 
 # Export plot
-ggsave(filename = "pearson_vs_phylodist.png", height = 8, width = 10, units = "in")
-
-
+ggsave(filename = file.path("explore_graphs", "spearman_vs_phylodist.png"), height = 8, width = 10, units = "in")
 
 # End ----
