@@ -35,10 +35,10 @@ sync_df <- read.csv(file = file.path("tidy_data", "synchrony_data.csv")) %>%
 dplyr::glimpse(sync_df)
 
 # Identify output folder
-export_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
+stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Check its current contents
-googledrive::drive_ls(export_folder)
+googledrive::drive_ls(stats_drive)
 
 # Create a local folder for exporting results to
 dir.create(path = file.path("stats_results"), showWarnings = F)
@@ -366,11 +366,11 @@ write.csv(x = aov_df, file = file.path("stats_results", aov_name), row.names = F
 write.csv(x = pairs_df, file = file.path("stats_results", pairs_name), row.names = F, na = '')
 
 # Upload both to Google Drive
-googledrive::drive_upload(media = file.path("stats_results", aov_name), path = export_folder, overwrite = T)
-googledrive::drive_upload(media = file.path("stats_results", pairs_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", aov_name), path = stats_drive, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", pairs_name), path = stats_drive, overwrite = T)
 
 # Clean up environment
-rm(list = setdiff(ls(), c("sync_df", "export_folder", "iter_num")))
+rm(list = setdiff(ls(), c("sync_df", "stats_drive", "iter_num")))
 
 ## ------------------------------------------ ##
        # Trait Status ANOVAs - Fit ----
@@ -692,10 +692,10 @@ write.csv(x = stat_df, file = file.path("stats_results", stat_name), row.names =
 write.csv(x = stat_pair_df, file = file.path("stats_results", stat_pair_name), row.names = F, na = '')
 
 # Upload both to Google Drive
-googledrive::drive_upload(media = file.path("stats_results", stat_name), path = export_folder, overwrite = T)
-googledrive::drive_upload(media = file.path("stats_results", stat_pair_name), path = export_folder, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", stat_name), path = stats_drive, overwrite = T)
+googledrive::drive_upload(media = file.path("stats_results", stat_pair_name), path = stats_drive, overwrite = T)
 
 # Clean up environment
-rm(list = setdiff(ls(), c("sync_df", "export_folder", "iter_num")))
+rm(list = setdiff(ls(), c("sync_df", "stats_drive", "iter_num")))
 
 # End ----
