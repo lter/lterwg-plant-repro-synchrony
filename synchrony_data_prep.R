@@ -41,8 +41,15 @@ wanted_files <- tidy_files %>%
 # Check this out to make sure it includes all files that we need
 wanted_files
 
-# Download these files
-purrr::walk(wanted_files$id, ~ googledrive::drive_download(as_id(.x), overwrite = T))
+# Create a folder to write these files to
+dir.create(path = file.path("source_data"), showWarnings = F)
+
+# Download these files into that folder
+purrr::walk2(.x = wanted_files$id,
+             .y = wanted_files$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x),
+                                                path = file.path("source_data", .y),
+                                                overwrite = T))
 
 ## ------------------------------------------ ##
           # Prepare to Merge Data ----
