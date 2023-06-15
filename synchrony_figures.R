@@ -20,7 +20,7 @@ rm(list = ls())
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
 trait_file <- "pre_ordination_trait_data.csv" # trait data
 perm_file <- "pairwise_corr_perm.csv" # correlation permutation data
-mrm_file <- "MRM_not_averaged_results_2023-04-06_10000perm.csv" # MRM results
+mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
 
 # Identify links of relevant Drive folders
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
