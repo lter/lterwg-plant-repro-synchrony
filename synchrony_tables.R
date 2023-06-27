@@ -172,7 +172,7 @@ write.csv(plot_table, row.names = F, na = '',
           file = file.path("table_data", "plot_data_table.csv"))
 
 ## ------------------------------------------ ##
-# Export ----
+                  # Export ----
 ## ------------------------------------------ ##
 
 # Identify folder to export plots to
