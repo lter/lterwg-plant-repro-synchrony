@@ -19,19 +19,15 @@ rm(list = ls())
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
 trait_file <- "pre_ordination_trait_data.csv" # trait data
-perm_file <- "pairwise_corr_perm.csv" # correlation permutation data
-mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
 
 # Identify links of relevant Drive folders
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Identify relevant data from those folders
 ## List out all CSVs in all folders
 (wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
     ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file)))
+    dplyr::filter(name %in% c(sync_file, trait_file)))
 
 # Create folder to download files into
 dir.create(path = file.path("figure_data"), showWarnings = F)
@@ -151,10 +147,10 @@ plot_table <- sync_df %>%
   # Calculate desired metrics with sites
   dplyr::group_by(lter) %>%
   dplyr::summarize(plot_ct = length(unique(Plot.ID)),
-                   mean_CWD = mean(CWD, na.rm = T),
-                   min_CWD = min(CWD, na.rm = T),
-                   max_CWD = max(CWD, na.rm = T),
-                   mean_overlap = mean(overlap, na.rm = T),
+                   mean_CWD = round(mean(CWD, na.rm = T), digits = 1),
+                   min_CWD = round(min(CWD, na.rm = T), digits = 1),
+                   max_CWD = round(max(CWD, na.rm = T), digits = 1),
+                   mean_overlap = round(mean(overlap, na.rm = T), digits = 1),
                    max_overlap = max(overlap, na.rm = T) ) %>%
   dplyr::ungroup() %>%
   # Attach species and varying trait numbers
