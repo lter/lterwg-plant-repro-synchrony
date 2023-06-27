@@ -63,10 +63,108 @@ sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
 # Glimpse it
 dplyr::glimpse(sync_df)
 
+# Read in trait information
+spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
+  # Pivot to long format
+  tidyr::pivot_longer(cols = -lter:-Species.Name,
+                      names_to = "trait", values_to = "trait_value") %>%
+  # Streamline trait names to make NMS trait vectors simpler
+  dplyr::mutate(trait_actual = dplyr::case_when(
+    trait == "Deciduous_Evergreen_yrs__deciduous" ~ "Deciduous",
+    trait == "Deciduous_Evergreen_yrs__evergreen" ~ "Evergreen",
+    trait == "Dispersal_syndrome__abiotic" ~ "Abiotic_disp",
+    trait == "Dispersal_syndrome__endozoochory" ~ "Endozo_disp",
+    trait == "Dispersal_syndrome__synzoochory" ~ "Synzo_disp",
+    trait == "Fleshy_fruit__no" ~ "Not_fleshy_fruit",
+    trait == "Fleshy_fruit__yes" ~ "Fleshy_fruit",
+    trait == "Growth_form__liana" ~ "Liana",
+    trait == "Growth_form__shrub" ~ "Shrub",
+    trait == "Growth_form__tree" ~ "Tree",
+    trait == "Log10_seed_mass_mg" ~ "Log_seed_mass",
+    trait == "Mycorrhiza_AM_EM__am" ~ "AM_mycorr",
+    trait == "Mycorrhiza_AM_EM__em" ~ "EM_mycorr",
+    trait == "Mycorrhiza_AM_EM__ericoid" ~ "Ericoid_mycorr",
+    trait == "Mycorrhiza_AM_EM__none" ~ "No_mycorr",
+    trait == "Pollinator_code__animal" ~ "Animal_pollinated",
+    trait == "Pollinator_code__wind" ~ "Wind_pollinated",
+    ## Can't think of a great abbreviation for these two traits
+    # trait == "Seed_bank__no" ~ "No_seed_bank",
+    # trait == "Seed_bank__yes" ~ "Yes_seed_bank",
+    trait == "Seed_development_1_2or3yrs" ~ "Seed_dev_time",
+    trait == "Sexual_system__dioecious" ~ "Dioecious",
+    trait == "Sexual_system__hermaphrodite" ~ "Hermaphrodite",
+    trait == "Sexual_system__monoecious" ~ "Monoecious",
+    trait == "Sexual_system__polygamo_dioecious" ~ "Polygamo_dioecious",
+    trait == "Shade_tolerance__intermediate" ~ "Shade_intermediate_tolerant",
+    trait == "Shade_tolerance__intolerant" ~ "Shade_intolerant",
+    trait == "Shade_tolerance__tolerant" ~ "Shade_tolerant",
+    TRUE ~ trait)) %>%
+  # Drop original trait column
+  dplyr::select(-trait) %>%
+  # Pivot back to wide format
+  tidyr::pivot_wider(names_from = trait_actual, values_from = trait_value) %>%
+  # Filter to only desired LTERs
+  dplyr::filter(lter %in% c("AND", "BNZ", "CDR", "CWT", "HBR", "LUQ", "SEV"))
 
+# Glimpse it
+dplyr::glimpse(spp_traits)
 
+## ------------------------------------------ ##
+# Site Table Data ----
+## ------------------------------------------ ##
 
+# Identify number of species per lter
+spp_num <- spp_traits %>%
+  dplyr::group_by(lter) %>%
+  dplyr::summarize(species_ct = length(unique(Species.Name))) %>%
+  dplyr::ungroup()
 
+# Look at that
+spp_num
+
+# Identify number of traits that vary
+var_trait_num <- sync_df %>%
+  # Pare down to desired columns
+  dplyr::select(lter, dplyr::ends_with("shared")) %>%
+  # Pivot to long format
+  tidyr::pivot_longer(cols = dplyr::ends_with("shared"), names_to = "trait") %>%
+  # Identify traits that vary
+  dplyr::group_by(lter, trait) %>%
+  dplyr::summarize(level_ct = length(unique(value))) %>%
+  dplyr::ungroup() %>%
+  # Filter to only varying traits
+  dplyr::filter(level_ct != 1) %>%
+  # Count number of varying traits
+  dplyr::group_by(lter) %>%
+  dplyr::summarize(variable_trait_ct = dplyr::n()) %>%
+  dplyr::ungroup() %>%
+  glimpse()
+
+# Check that out
+var_trait_num
+
+# Do remaining summarization
+plot_table <- sync_df %>%
+  # Group by site
+  dplyr::group_by(lter) %>%
+  # Calculate desired metrics
+  dplyr::summarize(plot_ct = length(unique(Plot.ID)),
+                   mean_CWD = mean(CWD, na.rm = T),
+                   min_CWD = min(CWD, na.rm = T),
+                   max_CWD = max(CWD, na.rm = T),
+                   mean_overlap = mean(overlap, na.rm = T),
+                   max_overlap = max(overlap, na.rm = T) ) %>%
+  # ungroup
+  dplyr::ungroup() %>%
+  # Attach species and varying trait numbers
+  dplyr::left_join(y = spp_num, by = "lter") %>%
+  dplyr::left_join(y = var_trait_num, by = "lter") %>%
+  # Re-order a bit
+  dplyr::relocate(species_ct, .before = plot_ct) %>%
+  dplyr::relocate(variable_trait_ct, .before = mean_CWD)
+
+# Check that out
+dplyr::glimpse(plot_table)
 
 
 # End ----
