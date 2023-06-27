@@ -43,6 +43,9 @@ purrr::walk2(.x = wanted_files$id,
                                                 path = file.path("figure_data", .y),
                                                 overwrite = T))
 
+# Make a folder to export tables to
+dir.create(path = file.path("table_data"), showWarnings = F)
+
 ## ------------------------------------------ ##
               # Data Wrangling ----
 ## ------------------------------------------ ##
@@ -110,7 +113,7 @@ spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
 dplyr::glimpse(spp_traits)
 
 ## ------------------------------------------ ##
-# Site Table Data ----
+              # Site Table Data ----
 ## ------------------------------------------ ##
 
 # Identify number of species per lter
@@ -145,16 +148,14 @@ var_trait_num
 
 # Do remaining summarization
 plot_table <- sync_df %>%
-  # Group by site
+  # Calculate desired metrics with sites
   dplyr::group_by(lter) %>%
-  # Calculate desired metrics
   dplyr::summarize(plot_ct = length(unique(Plot.ID)),
                    mean_CWD = mean(CWD, na.rm = T),
                    min_CWD = min(CWD, na.rm = T),
                    max_CWD = max(CWD, na.rm = T),
                    mean_overlap = mean(overlap, na.rm = T),
                    max_overlap = max(overlap, na.rm = T) ) %>%
-  # ungroup
   dplyr::ungroup() %>%
   # Attach species and varying trait numbers
   dplyr::left_join(y = spp_num, by = "lter") %>%
@@ -166,5 +167,23 @@ plot_table <- sync_df %>%
 # Check that out
 dplyr::glimpse(plot_table)
 
+# Export locally
+write.csv(plot_table, row.names = F, na = '', 
+          file = file.path("table_data", "plot_data_table.csv"))
+
+## ------------------------------------------ ##
+# Export ----
+## ------------------------------------------ ##
+
+# Identify folder to export plots to
+table_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1ReUBqmiZK2gwGePNt9VN0qcfcLiwZ_MZ")
+
+# Identify tables that we have created
+table <- dir(path = file.path("table_data"))
+
+# Upload each to the Drive (skipping the map if it's there)
+for(file in table){
+  googledrive::drive_upload(media = file.path("table_data", file),
+                            path = table_folder, overwrite = T) }
 
 # End ----
