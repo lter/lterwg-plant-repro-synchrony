@@ -67,7 +67,16 @@ mast_summary <- read.csv(file = file.path("source_data", "masting_summary_stats.
 # Simplify the mast summary statistics
 mast_v2 <- mast_summary %>%
   # Pare down to fewer columns
-  dplyr::select(lter, Species.Name, Plot.ID, CV.raw, ACL1.raw)
+  dplyr::select(lter, Species.Name, Plot.ID, CV.raw, ACL1.raw) %>%
+  # Standardize LTER names
+  dplyr::mutate(lter = dplyr::case_when(
+    lter == "Coweeta" ~ "CWT",
+    lter == "Luquillo" ~ "LUQ",
+    lter == "Sevilleta" ~ "SEV",
+    lter == "adirondack" ~ "ADK",
+    TRUE ~ lter)) %>%
+  # Remove duplicate rows if any exist
+  dplyr::distinct()
 
 # Glimpse it
 dplyr::glimpse(mast_v2)
@@ -279,7 +288,10 @@ sync_df <- merge_cor %>%
   # Drop any non-unique rows too
   dplyr::distinct()
 
-sync_df$TraitSimilarityJaccardVariant <- rowSums(sync_df[,10:21])/12
+# Calculate variant of Jaccard's distance for the following traits
+names(sync_df[,10:21])
+sync_df$TraitSimilarityJaccardVariant <- rowSums(sync_df[,10:21]) / 12
+
 # Take a look at this object
 dplyr::glimpse(sync_df)
 
@@ -344,7 +356,7 @@ googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/dr
 clim_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1tPM28pofJbpKXod3rXq-QEqjxGcU8xgt"), type = "csv") %>%
   dplyr::filter(name %in% c("climateSites_tidy.csv", "plot_data_ClimateSites.csv"))
 
-
+# Check out files
 clim_files
 
 # Download climate data and climate plot info
