@@ -21,17 +21,20 @@ sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
 trait_file <- "pre_ordination_trait_data.csv" # trait data
 perm_file <- "pairwise_corr_perm.csv" # correlation permutation data
 mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
+time_series_files <- c("series_andrews.csv", "series_bonanza.csv") # AND + BNZ time series info
 
 # Identify links of relevant Drive folders
+gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
 stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Identify relevant data from those folders
 ## List out all CSVs in all folders
 (wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-  dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
-  ## Filter to only desired files
-  dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file)))
+    dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
+    dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
+    ## Filter to only desired files
+    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file, time_series_files)))
 
 # Create folder to download files into
 dir.create(path = file.path("figure_data"), showWarnings = F)
@@ -174,9 +177,8 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 ## ------------------------------------------ ##
 
 # Read in data
-## NOTE: Need to eventually change to download directly from Google Drive
-and_df <- read.csv(file.path("figure_data", "andrew.csv"))
-bnz_df <- read.csv(file.path("figure_data", "bonanza.csv"))
+and_df <- read.csv(file.path("figure_data", "series_andrews.csv"))
+bnz_df <- read.csv(file.path("figure_data", "series_bonanza.csv"))
 
 # Wrangle Andrews data
 and_v2 <- and_df %>%
