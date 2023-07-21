@@ -354,7 +354,7 @@ googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/dr
 
 # Identify climate files
 clim_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1tPM28pofJbpKXod3rXq-QEqjxGcU8xgt"), type = "csv") %>%
-  dplyr::filter(name %in% c("climateSites_tidy.csv", "plot_data_ClimateSites.csv"))
+  dplyr::filter(name %in% c("climateSites_tidy_ANDupdate.csv", "plot_data_ClimateSites.csv"))
 
 # Check out files
 clim_files
@@ -366,7 +366,7 @@ purrr::walk2(.x = clim_files$id, .y = clim_files$name,
                                                 overwrite = T))
 
 # Read in climate data
-clim <- read.csv(file.path("source_data", "climateSites_tidy.csv")) %>%
+clim <- read.csv(file.path("source_data", "climateSites_tidy_ANDupdate.csv")) %>%
   # Pare down to desired columns
   dplyr::select(-X) %>%
   dplyr::rename(lter = SiteCode)%>%
