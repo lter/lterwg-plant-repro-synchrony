@@ -198,6 +198,8 @@ dplyr::glimpse(and_df)
 
 # Wrangle Bonanza in the same way
 bnz_v2 <- bnz_df %>%
+  # Filter to one site
+  dplyr::filter(supersite == "FP5A") %>%
   # Filter to same years
   dplyr::filter(Year >= 1985 & Year <= 2006) %>%
   # Calculate standardized values
@@ -218,54 +220,41 @@ spp_palette <- c("Abies.amabilis" = "#238b45", "Abies.lasiocarpa" = "#a8ddb5",
                  "Picea.mariana" = "#ae017e", "Larix.laricina" = "#d7301f")
 
 # Create the time series for Andrews Forest
-fig1a <- ggplot(and_v2, aes(x = Year, y = standardized, color = Species.Name)) +
+fig1_and <- ggplot(and_v2, aes(x = Year, y = standardized, color = Species.Name)) +
   geom_path(lwd = 1.25) +
   # Tweak graph aesthetics
   labs(x = "Year", y = "Standardized Reproduction") +
   scale_color_manual(values = spp_palette) +
   supportR::theme_lyon(title_size = 16, text_size = 13) +
-  theme(legend.position = "right"); fig1a
+  theme(legend.position = "right"); fig1_and
 
 # Do the same for Bonanza for one supersite
-fig1b_option1 <- bnz_v2 %>%
-  # Filter to one site
-  dplyr::filter(supersite == "FP2A") %>%
-  # Make plot
-  ggplot(aes(x = Year, y = standardized, color = Species.Name)) +
+fig1_bnz <- ggplot(bnz_v2, aes(x = Year, y = standardized, color = Species.Name)) +
   geom_path(lwd = 1.25) +
   # Tweak graph aesthetics
   labs(x = "Year", y = "Standardized Reproduction") +
   scale_color_manual(values = spp_palette) +
   supportR::theme_lyon(title_size = 16, text_size = 13) +
-  theme(legend.position = "right"); fig1b_option1
-
-# Do the same plot for another Bonanza supersite
-fig1b_option2 <- bnz_v2 %>%
-  # Filter to one site
-  dplyr::filter(supersite == "FP5A") %>%
-  # Make plot
-  ggplot(aes(x = Year, y = standardized, color = Species.Name)) +
-  geom_path(lwd = 1.25) +
-  # Tweak graph aesthetics
-  labs(x = "Year", y = "Standardized Reproduction") +
-  scale_color_manual(values = spp_palette) +
-  supportR::theme_lyon(title_size = 16, text_size = 13) +
-  theme(legend.position = "right"); fig1b_option2
+  theme(legend.position = "right"); fig1_bnz
 
 # Assemble A & B into column
-cowplot::plot_grid(fig1a, fig1b_option1, labels = "AUTO", nrow = 2)
+cowplot::plot_grid(fig1_bnz, fig1_and, labels = "AUTO", nrow = 2)
 
 # Export locally as both PNG & EPS (raster vs. vector files)
-ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_option1.png"),
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series.png"),
        plot = last_plot(), width = 7, height = 8, units = "in", dpi = 720)
-ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_option1.eps"),
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series.eps"),
        plot = last_plot(), width = 7, height = 8, units = "in", dpi = 720)
 
-# Create and export option 2 as well
-cowplot::plot_grid(fig1a, fig1b_option2, labels = "AUTO", nrow = 2)
-ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_option2.png"),
+# Generate version without legend
+cowplot::plot_grid(fig1_bnz + theme(legend.position = "none"), 
+                   fig1_and + theme(legend.position = "none"), 
+                   labels = "AUTO", nrow = 2)
+
+# Export locally again
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_noleg.png"),
        plot = last_plot(), width = 7, height = 8, units = "in", dpi = 720)
-ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_option2.eps"),
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig1AB_time_series_noleg.eps"),
        plot = last_plot(), width = 7, height = 8, units = "in", dpi = 720)
 
 # Clean up  environment
