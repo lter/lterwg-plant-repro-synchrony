@@ -19,7 +19,7 @@ rm(list = ls())
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
 trait_file <- "pre_ordination_trait_data.csv" # trait data
-perm_file <- "pairwise_corr_perm.csv" # correlation permutation data
+perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
 mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
 time_series_files <- c("series_andrews.csv", "series_bonanza.csv") # AND + BNZ time series info
 
