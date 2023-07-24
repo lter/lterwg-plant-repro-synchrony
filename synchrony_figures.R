@@ -271,21 +271,21 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 ## ------------------------------------------ ##
 
 # Identify average synchrony for the actual data and permutated data
-avg_corr_perm <- mean(perm_df$r.spearman.perm, na.rm = T)
+avg_corr_perm <- mean(perm_df$perm_r.spearman, na.rm = T)
 avg_corr_real <- mean(perm_df$r.spearman, na.rm = T)
 
-# Make an alternate that uses histograms
-ggplot(perm_df) +
+# Make the density plot graph
+ggplot(sync_df) +
   # Histogram of permuted synchrony + line at mean
   geom_vline(xintercept = avg_corr_perm, color = "gray32",
              linetype = 2, linewidth = 1) +
-  geom_histogram(aes(x = r.spearman.perm), alpha = 0.5, binwidth = 0.1,
-                 boundary = 0.1, fill = "gray32", color = "gray32") +
+  geom_density(data = perm_df, aes(x = perm_r.spearman), alpha = 0.5, 
+               fill = "gray32", color = "gray32") +
   # Same for real synchrony distribution + average
   geom_vline(xintercept = avg_corr_real, color = signif_palette[1],
              linetype = 2, linewidth = 1) +
-  geom_histogram(aes(x = r.spearman), alpha = 0.5, binwidth = 0.1,
-                 boundary = 0.1, fill = signif_palette[1], color = signif_palette[1]) +
+  geom_density(aes(x = r.spearman), alpha = 0.5, 
+               fill = signif_palette[1], color = signif_palette[1]) +
   # Formatting / aesthetics tweaks
   labs(x = "Cross-Species Synchrony", y = "Frequency") +
   supportR::theme_lyon() +
