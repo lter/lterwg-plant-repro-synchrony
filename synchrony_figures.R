@@ -332,16 +332,16 @@ fig3_cwd <- ggplot(sync_df, aes(x = CWD_log, y = r.spearman)) +
         legend.position = "right"); fig3_cwd
 
 # Create panel for per-site variation
-fig3_sites <- ggplot(perm_df, aes(x = lter)) +
+fig3_sites <- ggplot(sync_df, aes(x = lter)) +
   # Actual data points
   geom_jitter(aes(x = lter, y = r.spearman, shape = lter, color = lter), 
-              alpha = 0.3, width = 0.2, size = 1.3, pch = perm_df$solid_shapes) +
+              alpha = 0.3, width = 0.2, size = 1.3, pch = sync_df$solid_shapes) +
   # Horizontal line at 0
   geom_hline(yintercept = 0, linetype = 3, linewidth = 1) +
   # Add permuted / non-permuted synchrony values
   see::geom_violinhalf(aes(y = r.spearman, fill = lter), 
                        flip = F, alpha = 0.8) +
-  see::geom_violinhalf(aes(y = r.spearman.perm), 
+  see::geom_violinhalf(data = perm_df, aes(y = perm_r.spearman), 
                        flip = T, fill = "gray32", alpha = 0.5) +
   # Flip coordinates to be vertical
   coord_flip() +
