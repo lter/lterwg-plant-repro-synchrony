@@ -11,7 +11,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, see, vegan, njlyon0/supportR, cowplot)
+librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot)
 
 # Clear environment
 rm(list = ls())
