@@ -305,21 +305,21 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 # 4b = site ~ synchrony
 
 # Make a summarized dataframe for figure 4A
-fig3a_df <- supportR::summary_table(data = sync_df, groups = c("lter", "CWD_log"),
+fig3_cwd_df <- supportR::summary_table(data = sync_df, groups = c("lter", "CWD_log"),
                                     response = "r.spearman", drop_na = T)
 
 # Create climate panel
-fig3a <- ggplot(sync_df, aes(x = CWD_log, y = r.spearman)) +
+fig3_cwd <- ggplot(sync_df, aes(x = CWD_log, y = r.spearman)) +
   # Horizontal line at 0
   geom_hline(yintercept = 0, linetype = 3, linewidth = 1) +
   # Add un-averaged points
   geom_smooth(color = "black", fill = "gray82", method = "lm", formula = "y ~ x") +
   geom_point(aes(color = lter), alpha = 0.3, pch = sync_df$solid_shapes) +
   # Add averaged points with SD bars
-  geom_errorbar(data = fig3a_df, aes(x = CWD_log, y = mean, 
+  geom_errorbar(data = fig3_cwd_df, aes(x = CWD_log, y = mean, 
                                      ymax = mean + std_dev, 
                                      ymin = mean - std_dev), width = 0) +
-  geom_point(data = fig3a_df, aes(x = CWD_log, y = mean, fill = lter, 
+  geom_point(data = fig3_cwd_df, aes(x = CWD_log, y = mean, fill = lter, 
                                   shape = lter), size = 3) +
   scale_shape_manual(values = shp_palette) +
   # Customize colors, fills, and plot formatting
@@ -329,10 +329,10 @@ fig3a <- ggplot(sync_df, aes(x = CWD_log, y = r.spearman)) +
   scale_fill_manual(values = site_palette) +
   supportR::theme_lyon(title_size = 14, text_size = 11) +
   theme(legend.background = element_blank(),
-        legend.position = "right"); fig3a
+        legend.position = "right"); fig3_cwd
 
 # Create panel for per-site variation
-fig3b <- ggplot(perm_df, aes(x = lter)) +
+fig3_sites <- ggplot(perm_df, aes(x = lter)) +
   # Actual data points
   geom_jitter(aes(x = lter, y = r.spearman, shape = lter, color = lter), 
               alpha = 0.3, width = 0.2, size = 1.3, pch = perm_df$solid_shapes) +
@@ -352,10 +352,10 @@ fig3b <- ggplot(perm_df, aes(x = lter)) +
   scale_shape_manual(values = shp_palette) +
   scale_x_discrete(limits = c("CWT", "LUQ", "HBR", "AND", "CDR", "BNZ", "SEV")) +
   supportR::theme_lyon(title_size = 14, text_size = 11) +
-  theme(legend.position = 'none'); fig3b
+  theme(legend.position = 'none'); fig3_sites
 
 # Assemble the figure
-cowplot::plot_grid(fig3b, fig3a, labels = "AUTO", nrow = 1, ncol = 2, 
+cowplot::plot_grid(fig3_sites, fig3_cwd, labels = "AUTO", nrow = 1, ncol = 2, 
                    rel_widths = c(0.8, 1.2))
 
 # Export this
