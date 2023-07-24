@@ -287,7 +287,7 @@ ggplot(sync_df) +
   geom_density(aes(x = r.spearman), alpha = 0.5, 
                fill = signif_palette[1], color = signif_palette[1]) +
   # Formatting / aesthetics tweaks
-  labs(x = "Cross-Species Synchrony", y = "Frequency") +
+  labs(x = "Cross-Species Synchrony", y = "Density") +
   supportR::theme_lyon() +
   theme(legend.position = "none")
 
