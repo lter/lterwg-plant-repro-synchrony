@@ -11,7 +11,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot)
+librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot, magrittr)
 
 # Clear environment
 rm(list = ls())
@@ -270,9 +270,33 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 ## ------------------------------------------ ##
 
 # Calculate summary statistics for the manuscript
-round(mean(perm_df$r.spearman, na.rm = T), digits = 2)
-round(median(perm_df$r.spearman, na.rm = T), digits = 2)
-round(range(perm_df$r.spearman, na.rm = T), digits = 2)
+(summary_stats <- data.frame("lter" = "All Sites",
+                            "mean" = round(mean(perm_df$r.spearman, na.rm = T), digits = 2),
+                            "median" = round(median(perm_df$r.spearman, na.rm = T), digits = 2),
+                            "min" = round(min(perm_df$r.spearman, na.rm = T), digits = 2),
+                            "max" = round(max(perm_df$r.spearman, na.rm = T), digits = 2)) )
+
+# Calculate same metrics for each site as well
+for(site in unique(perm_df$lter)){
+  
+  # Filter to one site
+  sub_site <- dplyr::filter(perm_df, lter == site)
+  
+  # Calculate metrics
+  site_stats <- data.frame("lter" = site,
+                           "mean" = round(mean(sub_site$r.spearman, na.rm = T), digits = 2),
+                           "median" = round(median(sub_site$r.spearman, na.rm = T), digits = 2),
+                           "min" = round(min(sub_site$r.spearman, na.rm = T), digits = 2),
+                           "max" = round(max(sub_site$r.spearman, na.rm = T), digits = 2))
+  
+  # Attach to extant dataframe
+  summary_stats %<>%
+    dplyr::bind_rows(site_stats) }
+
+# Check that out
+summary_stats
+
+# Actual figure construction below here
 
 # Identify average synchrony for the actual data and permuted data
 avg_corr_perm <- mean(perm_df$perm_r.spearman, na.rm = T)
