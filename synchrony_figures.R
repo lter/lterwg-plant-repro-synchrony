@@ -40,8 +40,7 @@ stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1
 dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Download files into that folder
-purrr::walk2(.x = wanted_files$id, 
-             .y = wanted_files$name,
+purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
                                                 path = file.path("figure_data", .y),
                                                 overwrite = T))
@@ -270,7 +269,12 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
  # Figure 2 - Actual / Permuted Histograms ----
 ## ------------------------------------------ ##
 
-# Identify average synchrony for the actual data and permutated data
+# Calculate summary statistics for the manuscript
+round(mean(perm_df$r.spearman, na.rm = T), digits = 2)
+round(median(perm_df$r.spearman, na.rm = T), digits = 2)
+round(range(perm_df$r.spearman, na.rm = T), digits = 2)
+
+# Identify average synchrony for the actual data and permuted data
 avg_corr_perm <- mean(perm_df$perm_r.spearman, na.rm = T)
 avg_corr_real <- mean(perm_df$r.spearman, na.rm = T)
 
