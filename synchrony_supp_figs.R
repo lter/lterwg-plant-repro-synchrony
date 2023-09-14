@@ -761,7 +761,7 @@ for(sup5_site in unique(sync_df$lter)){
   
   # Export it!
   ggsave(filename = file.path("synchrony_supp_figures", 
-                              paste0("mrm_trait_levels_", sup5_site, ".png")),
+                              paste0("mrm_trait_status_", sup5_site, ".png")),
          plot = last_plot(), width = 10, height = 10, units = "in", dpi = 720)
   
   # Message
