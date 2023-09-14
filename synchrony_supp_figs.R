@@ -45,8 +45,7 @@ wanted_files
 dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Download files into that folder
-purrr::walk2(.x = wanted_files$id, 
-             .y = wanted_files$name,
+purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
                                                 path = file.path("figure_data", .y),
                                                 overwrite = T))
@@ -462,7 +461,9 @@ fig6_df <- sync_df %>%
   # Drop original CLD letter column
   dplyr::select(-letter) %>%
   # Tweak trait formatting to make cleaner facet labels
-  dplyr::mutate(trait_label = stringr::str_to_title(trait), .before = trait) %>%
+  dplyr::mutate(trait_label = factor(stringr::str_to_title(trait),
+                                     levels = sort(unique(stringr::str_to_title(trait)))), 
+                .before = trait) %>%
   # Tidy up / simplify trait levels to make x-axis tick marks as simple as possible
   dplyr::mutate(trait_levels = dplyr::case_when(
     ## Dispersal syndrome
@@ -879,7 +880,7 @@ for(sup5_site in unique(sync_df$lter)){
   
   # Export it!
   ggsave(filename = file.path("synchrony_supp_figures", 
-                              paste0("anova_trait_levels_", sup5_site, ".png")),
+                              paste0("anova_trait_status_", sup5_site, ".png")),
          plot = last_plot(), width = 10, height = 10, units = "in", dpi = 720)
   
   # Message
@@ -1095,7 +1096,7 @@ for(sup6_site in unique(sync_df$lter)){
   
   # Save it locally
   ggsave(filename = file.path("synchrony_supp_figures", 
-                              paste0("anova_trait_status_", sup6_site, ".png")),
+                              paste0("anova_trait_levels_", sup6_site, ".png")),
          plot = last_plot(), width = 14, height = 10, units = "in", dpi = 720)
   
   # Message
