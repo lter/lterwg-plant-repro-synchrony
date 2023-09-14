@@ -943,7 +943,9 @@ for(sup6_site in unique(sync_df$lter)){
     # Drop original CLD letter column
     dplyr::select(-letter) %>%
     # Tweak trait formatting to make cleaner facet labels
-    dplyr::mutate(trait_label = stringr::str_to_title(trait), .before = trait) %>%
+    dplyr::mutate(trait_label = factor(stringr::str_to_title(trait),
+                                       levels = sort(unique(stringr::str_to_title(trait)))), 
+                  .before = trait) %>%
     # Tidy up / simplify trait levels to make x-axis tick marks as simple as possible
     dplyr::mutate(trait_levels = dplyr::case_when(
       ## Dispersal syndrome
@@ -1009,7 +1011,7 @@ for(sup6_site in unique(sync_df$lter)){
   sup6_plotlist <- list()
   
   # Loop across traits
-  for(aov_trait in unique(sup6_df$trait_label)){
+  for(aov_trait in levels(sup6_df$trait_label)){
     # for(aov_trait in "Pollinator Values") {
     
     # Subset data to only that trait
