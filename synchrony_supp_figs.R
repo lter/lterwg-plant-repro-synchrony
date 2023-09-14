@@ -652,6 +652,51 @@ ggsave(filename = file.path("synchrony_supp_figures", "anova_trait_levels.png"),
 rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 
 ## ------------------------------------------ ##
+        # Experimental 'Line Graph' ----
+## ------------------------------------------ ##
+
+# Get the actual seed mass values
+seed_mass <- spp_traits %>% 
+  dplyr::select(lter, Species.Name, Log_seed_mass)
+
+# Glimpse it
+dplyr::glimpse(seed_mass)
+
+# Get a version of the data for this figure
+fig_exp <- sync_df %>%
+  # Average synchrony within species pairs / LTERs
+  dplyr::group_by(lter, Species_Pair, Species1, Species2) %>%
+  dplyr::summarize(r.spearman = mean(r.spearman, na.rm = T)) %>%
+  dplyr::ungroup() %>%
+  # Attach seed mass to both species
+  dplyr::left_join(y = seed_mass, by = c("lter", "Species1" = "Species.Name")) %>%
+  dplyr::left_join(y = seed_mass, by = c("lter", "Species2" = "Species.Name")) %>%
+  # Reshape to long format
+  tidyr::pivot_longer(cols = dplyr::contains("_seed_mass."),
+                      names_to = "junk", values_to = "Log_seed_mass") %>%
+  dplyr::select(-junk)
+
+# Glimpse this too
+dplyr::glimpse(fig_exp)
+
+# Make the figure!
+ggplot(data = fig_exp, aes(x = Log_seed_mass, y = r.spearman)) +
+  geom_path(aes(group = Species_Pair), alpha = 0.4, linewidth = 1) +
+  facet_grid(lter ~ .) +
+  labs(x = "Log(Seed Mass)", y = "Cross-Species Synchrony") +
+  theme(legend.position = "none",
+        panel.background = element_blank(),
+        panel.grid = element_blank(),
+        axis.line = element_line(color = "black"))
+  
+# Export it
+ggsave(filename = file.path("synchrony_supp_figures", "experimental_line_graph.png"),
+       plot = last_plot(), width = 12, height = 8, units = "in", dpi = 720)
+
+# Clean up  environment
+rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
+
+## ------------------------------------------ ##
       # Per Site Trait 'Status' MRMs ----
 ## ------------------------------------------ ##
 # 'Status' = 0 for un-shared vs. 1 for shared where trait value identity doesn't matter
