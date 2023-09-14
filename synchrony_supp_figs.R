@@ -555,7 +555,7 @@ level_vec <- c(
 fig6_plotlist <- list()
 
 # Loop across traits
-for(aov_trait in unique(fig6_df$trait_label)){
+for(aov_trait in levels(fig6_df$trait_label)){
   # for(aov_trait in "Pollinator Values") {
   
   # Subset data to only that trait
