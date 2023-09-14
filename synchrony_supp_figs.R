@@ -1162,8 +1162,8 @@ suppfig_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders
 # Identify figures that we have created
 suppfig <- dir(path = file.path("synchrony_supp_figures"))
 
-# Upload each to the Drive (skipping the map if it's there)
-for(file in setdiff(suppfig, c("sync_fig1C_map.png"))){
+# Upload each to the Drive (skipping giant files if there)
+for(file in setdiff(suppfig, c("anova_trait_levels.png", "anova_trait_status.png"))){
   googledrive::drive_upload(media = file.path("synchrony_supp_figures", file),
                             path = suppfig_folder, overwrite = T) }
 
