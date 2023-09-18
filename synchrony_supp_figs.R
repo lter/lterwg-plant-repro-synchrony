@@ -691,7 +691,7 @@ ggplot(data = fig_exp, aes(x = Log_seed_mass, y = r.spearman)) +
   
 # Export it
 ggsave(filename = file.path("synchrony_supp_figures", "experimental_line_graph.png"),
-       plot = last_plot(), width = 12, height = 8, units = "in", dpi = 720)
+       plot = last_plot(), width = 5, height = 8, units = "in", dpi = 720)
 
 # Clean up  environment
 rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
