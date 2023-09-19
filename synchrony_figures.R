@@ -305,14 +305,14 @@ avg_corr_real <- mean(perm_df$r.spearman, na.rm = T)
 # Make the density plot graph
 ggplot(sync_df) +
   # Histogram of permuted synchrony + line at mean
-  geom_vline(xintercept = avg_corr_perm, color = "gray32",
+  geom_vline(xintercept = avg_corr_perm, color = "gray32", trim = T,
              linetype = 2, linewidth = 1) +
   geom_density(data = perm_df, aes(x = perm_r.spearman), alpha = 0.5, 
                fill = "gray32", color = "gray32") +
   # Same for real synchrony distribution + average
   geom_vline(xintercept = avg_corr_real, color = signif_palette[1],
              linetype = 2, linewidth = 1) +
-  geom_density(aes(x = r.spearman), alpha = 0.5, 
+  geom_density(aes(x = r.spearman), alpha = 0.5, trim = T,
                fill = signif_palette[1], color = signif_palette[1]) +
   # Formatting / aesthetics tweaks
   labs(x = "Cross-Species Synchrony", y = "Density") +
