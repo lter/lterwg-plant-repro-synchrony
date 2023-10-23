@@ -168,6 +168,28 @@ write.csv(plot_table, row.names = F, na = '',
           file = file.path("table_data", "plot_data_table.csv"))
 
 ## ------------------------------------------ ##
+          # Trait Summary Values ----
+## ------------------------------------------ ##
+
+# Identify trait value columns
+trait_vals <- sync_df %>% 
+  dplyr::select(dplyr::contains("_values")) %>%
+  names()
+
+# Loop across traits
+for(trait in trait_vals){
+  
+  # Summarize various trait information
+  trait_tab <- supportR::summary_table(data = sync_df, groups = trait,
+                                      response = "r.spearman", drop_na = F)
+  
+  # Export locally
+  write.csv(trait_tab, row.names = F, na = '', 
+            file = file.path("table_data", paste0(trait, "_summary_table.csv")))
+  
+}
+
+## ------------------------------------------ ##
                   # Export ----
 ## ------------------------------------------ ##
 
