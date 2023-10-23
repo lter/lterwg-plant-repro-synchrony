@@ -97,13 +97,68 @@ glob_fit <- RRPP::lm.rrpp(r.spearman ~ corr.type, iter = 999, data = combo_df)
 # Extract ANOVA table
 glob_aov <- as.data.frame(anova(glob_fit)$table) %>%
   dplyr::mutate(lter = "All",
+                term = row.names(.),
                 .before = dplyr::everything())
 
-## ------------------------------------------ ##
+# Check that out
+glob_aov
 
 ## ------------------------------------------ ##
+          # Per-Site Analysis ----
+## ------------------------------------------ ##
 
+# Empty list for storing results
+site_list <- list()
 
+# Loop across sites
+for(site in unique(combo_df$lter)){
+  
+  # Processing message
+  message("Beginning analysis for LTER: ", site)
+  
+  # Subset the data
+  sub_df <- combo_df %>%
+    dplyr::filter(lter == site)
+  
+  # Fit model
+  sub_fit <- RRPP::lm.rrpp(r.spearman ~ corr.type, iter = 999, data = sub_df)
+  
+  # Extract ANOVA table and add to list
+  site_list[[site]] <- as.data.frame(anova(sub_fit)$table) %>%
+    dplyr::mutate(lter = site,
+                  term = row.names(.),
+                  .before = dplyr::everything())
+}
+
+## ------------------------------------------ ##
+        # Process Outputs & Export ----
+## ------------------------------------------ ##
+
+# Unlist site information
+site_aov <- purrr::list_rbind(x = site_list)
+  
+# Glimpse it
+dplyr::glimpse(site_aov)
+
+# Glimpse global AOV table too
+dplyr::glimpse(glob_aov)
+
+# Combine the two
+stat_out <- dplyr::bind_rows(glob_aov, site_aov) %>%
+  # Rename the P value column
+  dplyr::rename(P = `Pr(>F)`)
+
+# Generate time-stamped filename
+(file_name <- paste0("perm-vs-actual-results_", Sys.Date(), ".csv"))
+
+# Save locally
+write.csv(x = stat_out, file = file.path("stats_results", file_name), row.names = F, na = '')
+
+# Identify Drive destination
+stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
+
+# And upload to Drive
+googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
 
 ## ------------------------------------------ ##
 # Figure 2 - Actual / Permuted Histograms ----
