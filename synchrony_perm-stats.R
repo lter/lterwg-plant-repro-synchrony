@@ -8,25 +8,22 @@
 ## As of 10/23/23 this corresponds to the data presented in figures 2 and 3A
 
 ## ------------------------------------------ ##
-# Housekeeping ----
+                # Housekeeping ----
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot, magrittr)
+librarian::shelf(googledrive, tidyverse, RRPP)
 
 # Clear environment
 rm(list = ls())
 
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-trait_file <- "pre_ordination_trait_data.csv" # trait data
 perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
-mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
-time_series_files <- c("series_andrews.csv", "series_bonanza.csv") # AND + BNZ time series info
 
 # Identify links of relevant Drive folders
-gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
+gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
 stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Identify relevant data from those folders
@@ -35,15 +32,16 @@ stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1
     dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
     dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
     ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file, time_series_files)))
+    dplyr::filter(name %in% c(sync_file, perm_file)))
 
 # Create folder to download files into
-dir.create(path = file.path("figure_data"), showWarnings = F)
+dir.create(path = file.path("stats_results"), showWarnings = F)
+dir.create(path = file.path("tidy_data"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("figure_data", .y),
+                                                path = file.path("tidy_data", .y),
                                                 overwrite = T))
 
 ## ------------------------------------------ ##
