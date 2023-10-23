@@ -49,11 +49,11 @@ dplyr::glimpse(sync_df)
 rm(list = setdiff(x = ls(), y = "sync_df"))
 
 ## ------------------------------------------ ##
-# "Global" Analysis ----
+            # "Global" Analysis ----
 ## ------------------------------------------ ##
 
 # Fit model
-glob_fit <- RRPP::lm.rrpp(r.spearman ~ corr.type, iter = 999, data = combo_df)
+glob_fit <- RRPP::lm.rrpp(r.spearman ~ TraitSimilarityJaccardVariant, iter = 999, data = sync_df)
 
 # Extract ANOVA table
 glob_aov <- as.data.frame(anova(glob_fit)$table) %>%
@@ -65,24 +65,24 @@ glob_aov <- as.data.frame(anova(glob_fit)$table) %>%
 glob_aov
 
 ## ------------------------------------------ ##
-# Per-Site Analysis ----
+          # Per-Site Analysis ----
 ## ------------------------------------------ ##
 
 # Empty list for storing results
 site_list <- list()
 
 # Loop across sites
-for(site in unique(combo_df$lter)){
+for(site in unique(sync_df$lter)){
   
   # Processing message
   message("Beginning analysis for LTER: ", site)
   
   # Subset the data
-  sub_df <- combo_df %>%
+  sub_df <- sync_df %>%
     dplyr::filter(lter == site)
   
   # Fit model
-  sub_fit <- RRPP::lm.rrpp(r.spearman ~ corr.type, iter = 999, data = sub_df)
+  sub_fit <- RRPP::lm.rrpp(r.spearman ~ TraitSimilarityJaccardVariant, iter = 999, data = sub_df)
   
   # Extract ANOVA table and add to list
   site_list[[site]] <- as.data.frame(anova(sub_fit)$table) %>%
@@ -92,7 +92,7 @@ for(site in unique(combo_df$lter)){
 }
 
 ## ------------------------------------------ ##
-# Process Outputs & Export ----
+      # Process Outputs & Export ----
 ## ------------------------------------------ ##
 
 # Unlist site information
@@ -110,7 +110,7 @@ stat_out <- dplyr::bind_rows(glob_aov, site_aov) %>%
   dplyr::rename(P = `Pr(>F)`)
 
 # Generate time-stamped filename
-(file_name <- paste0("perm-vs-actual-results_", Sys.Date(), ".csv"))
+(file_name <- paste0("trait-sim-results_", Sys.Date(), ".csv"))
 
 # Save locally
 write.csv(x = stat_out, file = file.path("stats_results", file_name), row.names = F, na = '')
