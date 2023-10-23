@@ -24,13 +24,11 @@ perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
 # Identify links of relevant Drive folders
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
 gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
-stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
 
 # Identify relevant data from those folders
 ## List out all CSVs in all folders
 (wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
     dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
     ## Filter to only desired files
     dplyr::filter(name %in% c(sync_file, perm_file)))
 
