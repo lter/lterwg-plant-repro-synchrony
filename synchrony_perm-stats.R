@@ -45,70 +45,20 @@ purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
                                                 overwrite = T))
 
 ## ------------------------------------------ ##
-# Data Wrangling ----
+              # Data Wrangling ----
 ## ------------------------------------------ ##
 
 # Read in synchrony data
 sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
-  # Make a species pair column quickly
-  dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
-                .before = Species1) %>%
-  # Drop needleleaf vs broadleaf
-  dplyr::select(-dplyr::starts_with("Needleleaf_Broadleaf_")) %>%
-  # Add in solid shape values
-  dplyr::mutate(solid_shapes = dplyr::case_when(lter %in% c("AND", "HBR") ~ 15,
-                                                lter %in% c("BNZ", "LUQ") ~ 16,
-                                                lter %in% c("CDR", "SEV") ~ 17,
-                                                lter %in% c("CWT") ~ 18))
+  # Pare down to needed columns
+  dplyr::select(lter, Plot.ID, Species1, Species2, r.spearman) %>%
+  # Drop non-unique rows (shouldn't be any but better safe than sorry)
+  dplyr::distinct() %>%
+  # Add a column indicating the type of correlation this is
+  dplyr::mutate(corr.type = "actual", .before = r.spearman)
 
 # Glimpse it
 dplyr::glimpse(sync_df)
-
-# Read in trait information
-spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
-  # Pivot to long format
-  tidyr::pivot_longer(cols = -lter:-Species.Name,
-                      names_to = "trait", values_to = "trait_value") %>%
-  # Streamline trait names to make NMS trait vectors simpler
-  dplyr::mutate(trait_actual = dplyr::case_when(
-    trait == "Deciduous_Evergreen_yrs__deciduous" ~ "Deciduous",
-    trait == "Deciduous_Evergreen_yrs__evergreen" ~ "Evergreen",
-    trait == "Dispersal_syndrome__abiotic" ~ "Abiotic_disp",
-    trait == "Dispersal_syndrome__endozoochory" ~ "Endozo_disp",
-    trait == "Dispersal_syndrome__synzoochory" ~ "Synzo_disp",
-    trait == "Fleshy_fruit__no" ~ "Not_fleshy_fruit",
-    trait == "Fleshy_fruit__yes" ~ "Fleshy_fruit",
-    trait == "Growth_form__liana" ~ "Liana",
-    trait == "Growth_form__shrub" ~ "Shrub",
-    trait == "Growth_form__tree" ~ "Tree",
-    trait == "Log10_seed_mass_mg" ~ "Log_seed_mass",
-    trait == "Mycorrhiza_AM_EM__am" ~ "AM_mycorr",
-    trait == "Mycorrhiza_AM_EM__em" ~ "EM_mycorr",
-    trait == "Mycorrhiza_AM_EM__ericoid" ~ "Ericoid_mycorr",
-    trait == "Mycorrhiza_AM_EM__none" ~ "No_mycorr",
-    trait == "Pollinator_code__animal" ~ "Animal_pollinated",
-    trait == "Pollinator_code__wind" ~ "Wind_pollinated",
-    ## Can't think of a great abbreviation for these two traits
-    # trait == "Seed_bank__no" ~ "No_seed_bank",
-    # trait == "Seed_bank__yes" ~ "Yes_seed_bank",
-    trait == "Seed_development_1_2or3yrs" ~ "Seed_dev_time",
-    trait == "Sexual_system__dioecious" ~ "Dioecious",
-    trait == "Sexual_system__hermaphrodite" ~ "Hermaphrodite",
-    trait == "Sexual_system__monoecious" ~ "Monoecious",
-    trait == "Sexual_system__polygamo_dioecious" ~ "Polygamo_dioecious",
-    trait == "Shade_tolerance__intermediate" ~ "Shade_intermediate_tolerant",
-    trait == "Shade_tolerance__intolerant" ~ "Shade_intolerant",
-    trait == "Shade_tolerance__tolerant" ~ "Shade_tolerant",
-    TRUE ~ trait)) %>%
-  # Drop original trait column
-  dplyr::select(-trait) %>%
-  # Pivot back to wide format
-  tidyr::pivot_wider(names_from = trait_actual, values_from = trait_value) %>%
-  # Filter to only desired LTERs
-  dplyr::filter(lter %in% c("AND", "BNZ", "CDR", "CWT", "HBR", "LUQ", "SEV"))
-
-# Glimpse it
-dplyr::glimpse(spp_traits)
 
 # Read in permutations of correlations
 perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
@@ -116,59 +66,26 @@ perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
   dplyr::filter(lter %in% c("AND", "BNZ", "CDR", "CWT", "HBR", "LUQ", "SEV")) %>%
-  # Add in solid shape values
-  dplyr::mutate(solid_shapes = dplyr::case_when(lter %in% c("AND", "HBR") ~ 15,
-                                                lter %in% c("BNZ", "LUQ") ~ 16,
-                                                lter %in% c("CDR", "SEV") ~ 17,
-                                                lter %in% c("CWT") ~ 18))
+  # Pare down to desired columns
+  dplyr::select(lter, Plot.ID, Species1, Species2, perm_r.spearman) %>%
+  # Drop non-unique rows
+  dplyr::distinct() %>%
+  # Rename the correlation column
+  dplyr::rename(r.spearman = perm_r.spearman) %>% 
+  # Add a column for correlation type
+  dplyr::mutate(corr.type = "permuted", .before = r.spearman)
 
 # Check out structure
 dplyr::glimpse(perm_df)
 
-# Read in MRM results
-mrm_results <- read.csv(file = file.path("figure_data", mrm_file)) %>%
-  # Drop all but saturated model
-  dplyr::filter(model == "saturated model" & coef != "Int") %>%
-  # Make coefficient column match trait name
-  dplyr::mutate(coef = gsub(pattern = "dist\\(|\\)", replacement = "", x = coef)) %>%
-  # Determine result (sig vs. NS)
-  dplyr::mutate(result = ifelse(test = (pval < 0.05),
-                                yes = "sig", no = "NS")) %>%
-  # Pare down to minimum needed columns
-  dplyr::select(lter, coef, result) %>%
-  # Need to identify missing trait-site combinations
-  ## Can leverage `values_fill` argument in `pivot_wider` to do this *very* quickly
-  tidyr::pivot_wider(names_from = coef, values_from = result,
-                     values_fill = "NA") %>%
-  tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "result") %>%
-  # Filter to only the across site model
-  dplyr::filter(lter == "All")
+# Combine the two data objects
+combo_df <- dplyr::bind_rows(sync_df, perm_df)
 
-# Glimpse it
-dplyr::glimpse(mrm_results)
+# Check structure
+dplyr::glimpse(combo_df)
 
-# Create a local folder to export figures & supplemental figures to
-dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
-
-# Define color palettes
-# Site palette
-site_palette <- c("CWT" = "#bd0026", "LUQ" = "orange", "HBR" = "gold", 
-                  "AND" = "limegreen", "CDR" = "lightblue", "BNZ" = "#f1b6da", 
-                  "SEV" = "#9d4edd")
-
-# Significance palette
-signif_palette <- c("sig" = "#2a9d8f", "NS" = "gray87", "NA" = "white")
-
-# Define shape palette
-shp_palette <- c("AND" = 22, "BNZ" = 21, "CDR" = 24, "CWT" = 23, 
-                 "HBR" = 22, "LUQ" = 21, "SEV" = 24)
-
-# Define objects to keep
-keep_objects <- c("sync_df", "spp_traits", "perm_df", "mrm_results", 
-                  "site_palette", "signif_palette", "shp_palette")
-
-# Clean up  environment
-rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
+# Clean up environment
+rm(list = setdiff(x = ls(), y = "combo_df"))
 
 ## ------------------------------------------ ##
 # Figure 2 - Actual / Permuted Histograms ----
