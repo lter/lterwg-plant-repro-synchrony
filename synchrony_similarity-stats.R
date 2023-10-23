@@ -8,7 +8,7 @@
 ## As of 10/23/23 this corresponds to the data presented in figure 4B
 
 ## ------------------------------------------ ##
-# Housekeeping ----
+              # Housekeeping ----
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
@@ -19,22 +19,19 @@ rm(list = ls())
 
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
 
 # Identify links of relevant Drive folders
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
 
 # Identify relevant data from those folders
 ## List out all CSVs in all folders
 (wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
     ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, perm_file)))
+    dplyr::filter(name %in% c(sync_file)))
 
 # Create folder to download files into
-dir.create(path = file.path("stats_results"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
+dir.create(path = file.path("stats_results"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
@@ -42,48 +39,14 @@ purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
                                                 path = file.path("tidy_data", .y),
                                                 overwrite = T))
 
-## ------------------------------------------ ##
-# Data Wrangling ----
-## ------------------------------------------ ##
-
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
-  # Pare down to needed columns
-  dplyr::select(lter, Plot.ID, Species1, Species2, r.spearman) %>%
-  # Drop non-unique rows (shouldn't be any but better safe than sorry)
-  dplyr::distinct() %>%
-  # Add a column indicating the type of correlation this is
-  dplyr::mutate(corr.type = "actual", .before = r.spearman)
+sync_df <- read.csv(file = file.path("figure_data", sync_file))
 
 # Glimpse it
 dplyr::glimpse(sync_df)
 
-# Read in permutations of correlations
-perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
-  # Cut off below overlap threshold
-  dplyr::filter(overlap > 9) %>%
-  # Filter to only desired LTERs
-  dplyr::filter(lter %in% c("AND", "BNZ", "CDR", "CWT", "HBR", "LUQ", "SEV")) %>%
-  # Pare down to desired columns
-  dplyr::select(lter, Plot.ID, Species1, Species2, perm_r.spearman) %>%
-  # Drop non-unique rows
-  dplyr::distinct() %>%
-  # Rename the correlation column
-  dplyr::rename(r.spearman = perm_r.spearman) %>% 
-  # Add a column for correlation type
-  dplyr::mutate(corr.type = "permuted", .before = r.spearman)
-
-# Check out structure
-dplyr::glimpse(perm_df)
-
-# Combine the two data objects
-combo_df <- dplyr::bind_rows(sync_df, perm_df)
-
-# Check structure
-dplyr::glimpse(combo_df)
-
 # Clean up environment
-rm(list = setdiff(x = ls(), y = "combo_df"))
+rm(list = setdiff(x = ls(), y = "sync_df"))
 
 ## ------------------------------------------ ##
 # "Global" Analysis ----
