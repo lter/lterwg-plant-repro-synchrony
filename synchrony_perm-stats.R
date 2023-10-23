@@ -88,6 +88,24 @@ dplyr::glimpse(combo_df)
 rm(list = setdiff(x = ls(), y = "combo_df"))
 
 ## ------------------------------------------ ##
+          # "Global" Analysis ----
+## ------------------------------------------ ##
+
+# Fit model
+glob_fit <- RRPP::lm.rrpp(r.spearman ~ corr.type, iter = 999, data = combo_df)
+
+# Extract ANOVA table
+glob_aov <- as.data.frame(anova(glob_fit)$table) %>%
+  dplyr::mutate(lter = "All",
+                .before = dplyr::everything())
+
+## ------------------------------------------ ##
+
+## ------------------------------------------ ##
+
+
+
+## ------------------------------------------ ##
 # Figure 2 - Actual / Permuted Histograms ----
 ## ------------------------------------------ ##
 
