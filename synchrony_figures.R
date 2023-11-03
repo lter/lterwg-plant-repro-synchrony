@@ -325,6 +325,16 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
        # Figure 1A/B - Time Series ----
 ## ------------------------------------------ ##
 
+# Check the mean synchrony at our two desired plots
+sync_df %>% 
+  # Subset to just these plots
+  dplyr::filter((lter == "AND" & Plot.ID == "Mosquito Lakes") |
+                  (lter == "BNZ" & Plot.ID == "FP5A")) %>% 
+  # Calculate min/max synchrony
+  dplyr::group_by(lter, Plot.ID) %>% 
+  dplyr::summarize(min_corr = min(r.spearman, na.rm = T),
+                   max_corr = max(r.spearman, na.rm = T))
+
 # Read in data
 and_df <- read.csv(file.path("figure_data", "series_andrews.csv"))
 bnz_df <- read.csv(file.path("figure_data", "series_bonanza.csv"))
@@ -371,6 +381,8 @@ spp_palette <- c("Abies.amabilis" = "#238b45", "Abies.lasiocarpa" = "#a8ddb5",
 # Create the time series for Andrews Forest
 fig1_and <- ggplot(and_v2, aes(x = Year, y = standardized, color = Species.Name)) +
   geom_path(lwd = 1.25) +
+  # Set x-axis limits
+  xlim(1989, 2006) +
   # Tweak graph aesthetics
   labs(x = "Year", y = "Standardized Reproduction") +
   scale_color_manual(values = spp_palette) +
@@ -380,6 +392,8 @@ fig1_and <- ggplot(and_v2, aes(x = Year, y = standardized, color = Species.Name)
 # Do the same for Bonanza for one supersite
 fig1_bnz <- ggplot(bnz_v2, aes(x = Year, y = standardized, color = Species.Name)) +
   geom_path(lwd = 1.25) +
+  # Set x-axis limits
+  xlim(1989, 2006) +
   # Tweak graph aesthetics
   labs(x = "Year", y = "Standardized Reproduction") +
   scale_color_manual(values = spp_palette) +
