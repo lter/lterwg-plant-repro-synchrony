@@ -22,6 +22,9 @@ trait_file <- "pre_ordination_trait_data.csv" # trait data
 perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
 mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
 time_series_files <- c("series_andrews.csv", "series_bonanza.csv") # AND + BNZ time series info
+aov_file <- "ANOVA_trait_aov_tables_2023-06-14_10000perm.csv" # ANOVA results (trait levels)
+pair_file <- "ANOVA_trait_pairwise_comps_2023-06-14_10000perm.csv" # ANOVA pairwise comparisons
+stat_aov_file <- "ANOVA_trait_status_aov_tables_2023-06-14_10000perm.csv" # ANOVA on trait status (0 vs. 1)
 
 # Identify links of relevant Drive folders
 gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
@@ -34,7 +37,8 @@ stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1
     dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
     dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
     ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file, time_series_files)))
+    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file, 
+                              time_series_files, aov_file, pair_file, stat_aov_file)))
 
 # Create folder to download files into
 dir.create(path = file.path("figure_data"), showWarnings = F)
@@ -148,6 +152,151 @@ mrm_results <- read.csv(file = file.path("figure_data", mrm_file)) %>%
 # Glimpse it
 dplyr::glimpse(mrm_results)
 
+# Read in ANOVA results too
+aov_results <- read.csv(file = file.path("figure_data", aov_file)) %>%
+  # Remove unwanted rows
+  dplyr::filter(!term %in% c("Residuals", "Total")) %>%
+  # Pare down to minimum needed columns
+  dplyr::select(lter, term, P) %>%
+  # Get to unique rows only
+  dplyr::distinct() %>%
+  # Need to identify missing trait-site combinations
+  ## Can leverage `values_fill` argument in `pivot_wider` to do this *very* quickly
+  tidyr::pivot_wider(names_from = term, values_from = P,
+                     values_fill = 999) %>%
+  tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "P") %>%
+  # Determine result (sig vs. NS vs. NA)
+  dplyr::mutate(result = dplyr::case_when(P > 10 ~ "NA",
+                                          P < 0.05 ~ "sig",
+                                          TRUE ~ "NS")) %>%
+  # Wrangle P value for use as a label in plots
+  dplyr::mutate(P_round = as.character(round(P, digits = 12))) %>%
+  dplyr::mutate(
+    P_label = dplyr::case_when(as.numeric(P_round) < 0.001 ~ "P < 0.001",
+                               as.numeric(P_round) > 990 ~ "",
+                               as.numeric(P_round) >= 0.05 & 
+                                 as.numeric(P_round) < 900 ~ "NS",
+                               as.numeric(P_round) >= 0.001 &
+                                 as.numeric(P_round) < 0.05 ~ paste0("P = ",
+                                                                     stringr::str_sub(string = P_round, start = 1,  end = 5)))) %>%
+  # Drop unwanted columns
+  dplyr::select(-P_round, -P)
+
+# Glimpse it
+dplyr::glimpse(aov_results)
+
+# Read in pairwise comparisons results
+aov_pairs <- read.csv(file = file.path("figure_data", pair_file)) %>%
+  # Pare down to minimum needed columns
+  dplyr::select(lter, model, pairs, P) %>%
+  # Get to unique rows only
+  dplyr::distinct() %>% 
+  # Make the pairs non hyphenated
+  dplyr::mutate(pairs = gsub(pattern = "\\-", replacement = "_", x = pairs)) %>%
+  # Separate pairs into two columns
+  tidyr::separate(col = pairs, into = c("pair1", "pair2"), sep = ":")
+
+# Glimpse it
+dplyr::glimpse(aov_pairs)
+
+# Make an empty list
+aov_cld_list <- list()
+
+# Now we need to generate the 'compact letter display' (aka "CLD") to use in the plots
+## Loop across site
+for(pairs_lter in sort(unique(aov_pairs$lter))){
+  
+  # Subset to that site
+  pairs_sub <- aov_pairs %>%
+    dplyr::filter(lter == pairs_lter)
+  
+  # Generate an empty list
+  pairs_sub_list <- list()
+  
+  ## Loop across model (within site)
+  for(pairs_model in sort(unique(pairs_sub$model))) {
+    
+    # Subset to just this model
+    pairs_meta_sub <- pairs_sub %>%
+      dplyr::filter(model == pairs_model)
+    
+    # Create the necessary object for CLD identification
+    pre_cld <- pairs_meta_sub$P
+    names(pre_cld) <- paste0(pairs_meta_sub$pair1, "-", pairs_meta_sub$pair2)
+    
+    # Extract the raw CLD
+    raw_cld <- multcompView::multcompLetters(x = pre_cld, Letters = letters)
+    
+    # Wrangle this into a dataframe with necessary information
+    cld_df <- data.frame("lter" = pairs_lter,
+                         "trait" = pairs_model,
+                         "trait_levels" = gsub(pattern = "\\_", replacement = "-",
+                                               x = names(raw_cld$Letters)),
+                         "letter" = raw_cld$Letters)
+    
+    # Drop rownames
+    rownames(cld_df) <- NULL
+    
+    # Add to list
+    pairs_sub_list[[pairs_model]] <- cld_df
+    
+  } # Close within-LTER loop
+  
+  # Unlist into a dataframe
+  pairs_sub_df <- pairs_sub_list %>%
+    purrr::list_rbind(x = .)
+  
+  # And add that dataframe to the larger list
+  aov_cld_list[[pairs_lter]] <- pairs_sub_df
+  
+  # Success message
+  message("Finished processing '", pairs_lter, "'")
+  
+} # Close larger loop
+
+# Unlist to a data frame
+aov_cld <- purrr::list_rbind(x = aov_cld_list)
+
+# Glimpse this
+dplyr::glimpse(aov_cld)
+
+# Read in trait status ANOVA results too
+stat_aov <- read.csv(file.path("figure_data", stat_aov_file)) %>%
+  # Pare down to minimum needed columns
+  dplyr::select(lter, term, P) %>%
+  # Get to unique rows only
+  dplyr::distinct() %>%
+  # Filter out non-P value rows
+  dplyr::filter(!is.na(P)) %>%
+  # Need to identify missing trait-site combinations
+  ## Can leverage `values_fill` argument in `pivot_wider` to do this *very* quickly
+  tidyr::pivot_wider(names_from = term, values_from = P,
+                     values_fill = 999) %>%
+  tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "P") %>%
+  # Determine result (sig vs. NS vs. NA)
+  dplyr::mutate(result = dplyr::case_when(P > 10 ~ "NA",
+                                          P < 0.05 ~ "sig",
+                                          TRUE ~ "NS")) %>%
+  # Wrangle P value for use as a label in plots
+  dplyr::mutate(P_round = as.character(round(P, digits = 12))) %>%
+  dplyr::mutate(
+    P_label = dplyr::case_when(as.numeric(P_round) < 0.001 ~ "P < 0.001",
+                               as.numeric(P_round) > 990 ~ "",
+                               as.numeric(P_round) >= 0.05 & 
+                                 as.numeric(P_round) < 900 ~ "NS",
+                               as.numeric(P_round) >= 0.001 &
+                                 as.numeric(P_round) < 0.05 ~ paste0("P = ",
+                                                                     stringr::str_sub(string = P_round, start = 1,  end = 5)))) %>%
+  # Drop unwanted columns
+  dplyr::select(-P_round, -P)
+
+# Glimpse this
+dplyr::glimpse(stat_aov)
+
+## ------------------------------------------ ##
+    # Graph Aesthetic Standardization ----
+## ------------------------------------------ ##
+
 # Create a local folder to export figures & supplemental figures to
 dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
 
@@ -166,6 +315,7 @@ shp_palette <- c("AND" = 22, "BNZ" = 21, "CDR" = 24, "CWT" = 23,
 
 # Define objects to keep
 keep_objects <- c("sync_df", "spp_traits", "perm_df", "mrm_results", 
+                  "stat_aov", "aov_cld", "aov_pairs",
                   "site_palette", "signif_palette", "shp_palette")
 
 # Clean up  environment
