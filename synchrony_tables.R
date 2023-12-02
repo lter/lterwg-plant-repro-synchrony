@@ -1,7 +1,7 @@
 ## ------------------------------------------ ##
           # Synchrony Summary Tables
 ## ------------------------------------------ ##
-# Written by: Nick J Lyon
+# Written by: Nick J Lyon, Angel Chen
 
 # PURPOSE
 ## Create summary tables for inclusion in the paper
@@ -11,7 +11,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, supportR)
+librarian::shelf(googledrive, tidyverse, supportR, rstatix)
 
 # Clear environment
 rm(list = ls())
@@ -19,15 +19,25 @@ rm(list = ls())
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
 trait_file <- "pre_ordination_trait_data.csv" # trait data
+full_trait_file <- "LTER_integrated_attributes_USDA_2022-12-14.csv" # complete trait data
 
 # Identify links of relevant Drive folders
 sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
+att_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1PGaPAkNz1lmvZQMwwthmS-ZjQ97BS2Am")
 
 # Identify relevant data from those folders
 ## List out all CSVs in all folders
-(wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
+wanted_files1 <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
     ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file)))
+    dplyr::filter(name %in% c(sync_file, trait_file))
+
+## List out all CSVs in all folders
+wanted_files2 <- googledrive::drive_ls(path = att_folder, type = "csv") %>%
+  ## Filter to only desired files
+  dplyr::filter(name %in% c(full_trait_file))
+
+# Combine file IDs
+(wanted_files <- rbind(wanted_files1, wanted_files2))
 
 # Create folder to download files into
 dir.create(path = file.path("figure_data"), showWarnings = F)
@@ -38,11 +48,6 @@ purrr::walk2(.x = wanted_files$id,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
                                                 path = file.path("figure_data", .y),
                                                 overwrite = T))
-
-# Also download the full integrated attributes table (for later)
-googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1PGaPAkNz1lmvZQMwwthmS-ZjQ97BS2Am")) %>%
-  dplyr::filter(name == "LTER_integrated_attributes_USDA_2022-12-14.csv") %>%
-  googledrive::drive_download(file = .$id, path = file.path("figure_data",.$name), overwrite = T)
 
 # Make a folder to export tables to
 dir.create(path = file.path("table_data"), showWarnings = F)
@@ -201,11 +206,11 @@ for(trait in trait_vals){
 # ------------------------------- Data Prep ------------------------------------
 
 # Read in the pre ordination trait data
-pre_ord_traits <- read.csv(file = file.path("figure_data", "pre_ordination_trait_data.csv")) %>%
+pre_ord_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
   mutate(Species.Name = gsub("\\."," ", Species.Name)) 
 
 # Read in the full trait data
-all_traits <- read.csv(file = file.path("figure_data", "LTER_integrated_attributes_USDA_2022-12-14.csv")) 
+all_traits <- read.csv(file = file.path("figure_data", full_trait_file)) 
 
 # Grab the exact seed mass values 
 seed_mass <- all_traits %>%
@@ -278,14 +283,14 @@ quant_stats_altogether <- overall_quant_stats %>%
   dplyr::rename(trait = variable)
 
 # Exporting quantitative stats
-write.csv(quant_stats_altogether, file.path("table_data", "quant_trait_stats.csv"), row.names = FALSE)
+write.csv(quant_stats_altogether, file.path("table_data", "Table_S2_quant_trait_stats.csv"), row.names = FALSE)
 
 # --------------------- Calculating Qualitative Stats --------------------------
 
 # Listing the columns we want
-columns_we_want <- c("Pollinator_code", "Mycorrhiza_AM_EM", "Deciduous_Evergreen_yrs",
-                     "Dispersal_syndrome", "Sexual_system", "Shade_tolerance",
-                     "Growth_form", "Fleshy_fruit", "Seed_bank")
+columns_we_want <- c("Deciduous_Evergreen_yrs", "Dispersal_syndrome", "Fleshy_fruit", "Growth_form",
+                     "Mycorrhiza_AM_EM", "Pollinator_code", "Seed_bank",
+                     "Seed_development_1_2or3yrs", "Sexual_system", "Shade_tolerance")
 
 overall_qual_stats <- list()
 
@@ -347,7 +352,7 @@ qual_stats_altogether <- overall_qual_stats_v2 %>%
   dplyr::rename(trait_value = value)
 
 # Exporting qualitative stats
-write.csv(qual_stats_altogether, file.path("table_data", "qual_trait_stats.csv"), row.names = FALSE)
+write.csv(qual_stats_altogether, file.path("table_data", "Table_S2_qual_trait_stats.csv"), row.names = FALSE)
 
 ## ------------------------------------------ ##
                   # Export ----
