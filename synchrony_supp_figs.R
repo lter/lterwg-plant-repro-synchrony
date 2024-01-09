@@ -979,6 +979,10 @@ for(sup6_site in unique(sync_df$lter)){
     # Pivot to long format
     tidyr::pivot_longer(cols = dplyr::ends_with("_values"),
                         names_to = "trait", values_to = "trait_levels") %>%
+    # Synonymize any trait name mismatches
+    dplyr::mutate(trait = dplyr::case_when(
+      trait == "Mycorrhiza_values" ~ "Mycorrhizal_assoc._values",
+      T ~ trait)) %>% 
     # Attach ANOVA results
     dplyr::left_join(aov_results, by = c("lter", "trait")) %>%
     # Simplify trait entries
