@@ -20,7 +20,7 @@ Under Construction!
 
 4. **`synchrony_anova`** - Performs permutation analysis of variance (perANOVA) to assess the effect of _each trait_ (<u>separately</u>) on synchrony. Requires data produced by `synchrony_stats_prep`
 
-5. - **`synchrony_similarity-stats`** - Performs perANOVA on the 'Jaccard variant' of trait similarity. "Variant" because the authors have made some tweaks to the calculation of this metric so it is similar to Jaccard but not technically the same thing. Requires data produced by `synchrony_stats_prep`
+5. **`synchrony_similarity-stats`** - Performs perANOVA on the 'Jaccard variant' of trait similarity. "Variant" because the authors have made some tweaks to the calculation of this metric so it is similar to Jaccard but not technically the same thing. Requires data produced by `synchrony_stats_prep`
 
 6. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data produced by `synchrony_stats_prep`
 
