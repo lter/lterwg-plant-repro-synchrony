@@ -174,7 +174,11 @@ mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
   tidyr::pivot_wider(names_from = coef, values_from = result, values_fill = "NA") %>%
   tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "result") %>%
   # Filter to only the across site model
-  dplyr::filter(lter == "All")
+  dplyr::filter(lter == "All") %>% 
+  # Tweak leaf longevity values
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "Deciduous_Evergreen_shared" ~ "Leaf_Longevity_shared",
+    T ~ trait))
 
 # Glimpse it
 dplyr::glimpse(mrm_results)
@@ -215,7 +219,7 @@ aov_results <- read.csv(file = file.path("tidy_data", aov_file)) %>%
   # Tweak leaf longevity values
   dplyr::mutate(trait = dplyr::case_when(
     trait == "Mycorrhiza_values" ~ "Mycorrhizal_assoc._values",
-    trait == "Deciduous_Evergreen_values" ~ "Leaf_longevity_values",
+    trait == "Deciduous_Evergreen_values" ~ "Leaf_Longevity_values",
     T ~ trait))
 
 # Glimpse it
