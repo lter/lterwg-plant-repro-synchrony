@@ -226,7 +226,7 @@ write.csv(x = aov_results, na = '', row.names = F,
           file = file.path("figure_data", "aov-levels_viz-ready.csv"))
 
 ## ------------------------------------------ ##
-      # ANOVA on 'Levels' (Pairwise) ----
+      # ANOVA on 'Levels' (Pairs) ----
 ## ------------------------------------------ ##
 # Read in pairwise comparisons results
 aov_pairs <- read.csv(file = file.path("tidy_data", pair_file)) %>%
@@ -247,6 +247,15 @@ aov_pairs <- read.csv(file = file.path("tidy_data", pair_file)) %>%
 
 # Glimpse it
 dplyr::glimpse(aov_pairs)
+
+# Export locally
+write.csv(x = aov_pairs, na = '', row.names = F,
+          file = file.path("figure_data", "aov-levels-pairs_viz-ready.csv"))
+
+## ------------------------------------------ ##
+         # ANOVA on 'Levels' (CLD) ----
+## ------------------------------------------ ##
+## CLD = Compact Letter Display
 
 # Make an empty list
 aov_cld_list <- list()
