@@ -334,7 +334,17 @@ sync_df %>%
   dplyr::summarize(min_corr = min(r.spearman, na.rm = T),
                    max_corr = max(r.spearman, na.rm = T))
 
-# Read in data
+# Identify the two site-specific time series that we need
+series_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")) %>% 
+  dplyr::filter(name %in% c("series_andrews.csv", "series_bonanza.csv"))
+
+# Download them
+purrr::walk2(.x = series_files$id, .y = series_files$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("figure_data", .y),
+                                                overwrite = T))
+
+# Read them in
 and_df <- read.csv(file.path("figure_data", "series_andrews.csv"))
 bnz_df <- read.csv(file.path("figure_data", "series_bonanza.csv"))
 
