@@ -173,8 +173,6 @@ mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
   ## Can leverage `values_fill` argument in `pivot_wider` to do this *very* quickly
   tidyr::pivot_wider(names_from = coef, values_from = result, values_fill = "NA") %>%
   tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "result") %>%
-  # Filter to only the across site model
-  dplyr::filter(lter == "All") %>% 
   # Tweak leaf longevity values
   dplyr::mutate(trait = dplyr::case_when(
     trait == "Deciduous_Evergreen_shared" ~ "Leaf_Longevity_shared",

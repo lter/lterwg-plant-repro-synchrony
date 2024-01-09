@@ -33,7 +33,9 @@ spp_traits <- read.csv(file = file.path("figure_data", "traits_viz-ready.csv"))
 perm_df <- read.csv(file = file.path("figure_data", "perm_viz-ready.csv"))
 
 # Read in MRM results
-mrm_results <- read.csv(file = file.path("figure_data", "mrm_viz-ready.csv"))
+mrm_results <- read.csv(file = file.path("figure_data", "mrm_viz-ready.csv")) %>% 
+  # Filter to only the across site model
+  dplyr::filter(lter == "All")
 
 # Read in ANOVA on trait 'status' (i.e., shared vs. unshared)
 stat_aov <- read.csv(file = file.path("figure_data", "aov-status_viz-ready.csv"))
