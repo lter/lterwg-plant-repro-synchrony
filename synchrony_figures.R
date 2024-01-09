@@ -637,7 +637,12 @@ fig5a_df <- sync_df %>%
                                                    x = trait)),
                 value = as.factor(value)) %>%
   # Also drop "shared" from trait names
-  dplyr::mutate(trait = gsub(pattern = " Shared", replacement = "", x = trait))
+  dplyr::mutate(trait = gsub(pattern = " Shared", replacement = "", x = trait)) %>% 
+  # Do any desired manual tweaks of the trait names
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "Mycorrhiza" ~ "Mycorrhizal Assoc.",
+    trait == "Deciduous Evergreen" ~ "Leaf Longevity",
+    T ~ trait))
 
 # Check that out
 glimpse(fig5a_df)
