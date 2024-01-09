@@ -488,6 +488,10 @@ fig6_df <- sync_df %>%
                       names_to = "trait", values_to = "trait_levels") %>%
   # Coerce lter to all
   dplyr::mutate(lter = "All") %>%
+  # Synonymize any trait name mismatches
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "Mycorrhiza_values" ~ "Mycorrhizal_assoc._values",
+    T ~ trait)) %>% 
   # Attach ANOVA results
   dplyr::left_join(aov_results, by = c("lter", "trait")) %>%
   # Simplify trait entries
