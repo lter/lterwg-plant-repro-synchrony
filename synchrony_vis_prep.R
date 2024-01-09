@@ -368,7 +368,7 @@ stat_aov <- read.csv(file.path("tidy_data", stat_aov_file)) %>%
 dplyr::glimpse(stat_aov)
 
 # Export locally
-write.csv(x = aov_cld, na = '', row.names = F,
+write.csv(x = stat_aov, na = '', row.names = F,
           file = file.path("figure_data", "aov-status_viz-ready.csv"))
 
 # End ----
