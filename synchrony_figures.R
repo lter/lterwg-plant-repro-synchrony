@@ -761,6 +761,11 @@ fig6_df <- sync_df %>%
                                      yes = NA, no = letter)) %>%
   # Drop original CLD letter column
   dplyr::select(-letter) %>%
+  # Do any desired manual tweaks of the trait names
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "mycorrhiza values" ~ "mycorrhizal assoc. values",
+    trait == "deciduous evergreen values" ~ "leaf longevity values",
+    T ~ trait)) %>% 
   # Tweak trait formatting to make cleaner facet labels
   dplyr::mutate(trait_label = factor(stringr::str_to_title(trait),
                                      levels = sort(unique(stringr::str_to_title(trait)))), 
@@ -826,7 +831,7 @@ fig6_df <- sync_df %>%
     # If isn't "fixed" above, keep as-is
     TRUE ~ trait_levels)) %>% 
   # Filter to only desired traits
-  dplyr::filter(trait %in% c("pollinator values", "deciduous evergreen values"))
+  dplyr::filter(trait %in% c("pollinator values", "leaf longevity values"))
 
 # Check it out
 dplyr::glimpse(fig6_df)
@@ -858,7 +863,7 @@ level_vec <- c(
 fig6_plotlist <- list()
 
 # Loop across traits
-for(aov_trait in unique(fig6_df$trait_label)){
+for(aov_trait in sort(unique(fig6_df$trait_label))){
   # for(aov_trait in "Pollinator Values") {
   
   # Subset data to only that trait
@@ -917,7 +922,7 @@ for(aov_trait in unique(fig6_df$trait_label)){
       fig6_subplot <- fig6_subplot +
         geom_text(label = fig6_subcld[[level_num]], 
                   x = names(fig6_subcld[level_num]), 
-                  y = 1, angle = 90) } }
+                  y = 1, angle = 0) } }
   
   # Add plot to the list
   fig6_plotlist[[aov_trait]] <- fig6_subplot
@@ -928,8 +933,7 @@ for(aov_trait in unique(fig6_df$trait_label)){
 } # Close figure list
 
 # Generate actual figure
-cowplot::plot_grid(plotlist = fig6_plotlist, nrow = 1, ncol = 2, align = 'h',
-                   labels = rep(x = "", times = length(fig6_plotlist)))
+cowplot::plot_grid(plotlist = fig6_plotlist, nrow = 1, ncol = 2, align = 'h', labels = "AUTO")
 
 # Save it locally
 ggsave(filename = file.path("synchrony_figure_files", "sync_fig6_ANOVA_results_levels.png"),
