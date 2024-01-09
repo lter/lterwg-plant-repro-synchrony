@@ -78,30 +78,29 @@ spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
   dplyr::mutate(trait_actual = dplyr::case_when(
     trait == "Deciduous_Evergreen_yrs__deciduous" ~ "Deciduous",
     trait == "Deciduous_Evergreen_yrs__evergreen" ~ "Evergreen",
-    trait == "Dispersal_syndrome__abiotic" ~ "Abiotic_disp",
-    trait == "Dispersal_syndrome__endozoochory" ~ "Endozo_disp",
-    trait == "Dispersal_syndrome__synzoochory" ~ "Synzo_disp",
-    trait == "Fleshy_fruit__no" ~ "Not_fleshy_fruit",
+    trait == "Dispersal_syndrome__abiotic" ~ "Abiotic_disp.",
+    trait == "Dispersal_syndrome__endozoochory" ~ "Endozoochory",
+    trait == "Dispersal_syndrome__synzoochory" ~ "Synzoochory",
+    trait == "Fleshy_fruit__no" ~ "Dry_fruit",
     trait == "Fleshy_fruit__yes" ~ "Fleshy_fruit",
     trait == "Growth_form__liana" ~ "Liana",
     trait == "Growth_form__shrub" ~ "Shrub",
     trait == "Growth_form__tree" ~ "Tree",
-    trait == "Log10_seed_mass_mg" ~ "Log_seed_mass",
-    trait == "Mycorrhiza_AM_EM__am" ~ "AM_mycorr",
-    trait == "Mycorrhiza_AM_EM__em" ~ "EM_mycorr",
-    trait == "Mycorrhiza_AM_EM__ericoid" ~ "Ericoid_mycorr",
-    trait == "Mycorrhiza_AM_EM__none" ~ "No_mycorr",
+    trait == "Log10_seed_mass_mg" ~ "Seed_mass",
+    trait == "Mycorrhiza_AM_EM__am" ~ "AM",
+    trait == "Mycorrhiza_AM_EM__em" ~ "EM",
+    trait == "Mycorrhiza_AM_EM__ericoid" ~ "Ericoid",
+    trait == "Mycorrhiza_AM_EM__none" ~ "No_mycorr.",
     trait == "Pollinator_code__animal" ~ "Animal_pollinated",
     trait == "Pollinator_code__wind" ~ "Wind_pollinated",
-    ## Can't think of a great abbreviation for these two traits
-    # trait == "Seed_bank__no" ~ "No_seed_bank",
-    # trait == "Seed_bank__yes" ~ "Yes_seed_bank",
+    trait == "Seed_bank__no" ~ "No_seed_bank",
+    trait == "Seed_bank__yes" ~ "Seed_bank",
     trait == "Seed_development_1_2or3yrs" ~ "Seed_dev_time",
     trait == "Sexual_system__dioecious" ~ "Dioecious",
     trait == "Sexual_system__hermaphrodite" ~ "Hermaphrodite",
     trait == "Sexual_system__monoecious" ~ "Monoecious",
     trait == "Sexual_system__polygamo_dioecious" ~ "Polygamo_dioecious",
-    trait == "Shade_tolerance__intermediate" ~ "Shade_intermediate_tolerant",
+    trait == "Shade_tolerance__intermediate" ~ "Shade_med._tolerant",
     trait == "Shade_tolerance__intolerant" ~ "Shade_intolerant",
     trait == "Shade_tolerance__tolerant" ~ "Shade_tolerant",
     TRUE ~ trait)) %>%
@@ -570,11 +569,11 @@ trait_fit <- vegan::envfit(ord = trait_mds, env = spp_traits[-c(1:2)], permutati
 
 # Make (and export) ordination
 png(file = file.path("synchrony_figure_files", "sync_fig4A_trait_nms.png"), 
-     width = 720, height = 720)
+     width = 750, height = 550)
 supportR::nms_ord(mod = trait_mds, groupcol = spp_traits$lter, leg_pos = "bottomleft",
                   colors = site_palette[sort(names(site_palette))],
                   pt_size = 2.5, pt_alpha = 0.5)
-graphics::plot(x = trait_fit, col = "black", cex = 1.0)
+graphics::plot(x = trait_fit, col = "black", cex = 1.2)
 dev.off()
 
 # Clean up  environment
