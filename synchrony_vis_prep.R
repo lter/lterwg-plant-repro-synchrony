@@ -54,7 +54,7 @@ purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
                                                 overwrite = T))
 
 ## ------------------------------------------ ##
-            # Data Wrangling ----
+        # Wrangle - Synchrony Data ----
 ## ------------------------------------------ ##
 
 # Read in synchrony data
@@ -64,6 +64,9 @@ sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
                 .before = Species1) %>%
   # Drop needleleaf vs broadleaf
   dplyr::select(-dplyr::starts_with("Needleleaf_Broadleaf_")) %>%
+  # Rename 'deciduous/evergreen' column
+  dplyr::rename(Leaf_Longevity_values = Deciduous_Evergreen_values) %>% 
+  dplyr::rename(Leaf_Longevity_shared = Deciduous_Evergreen_shared) %>% 
   # Add in solid shape values
   dplyr::mutate(solid_shapes = dplyr::case_when(lter %in% c("AND", "HBR") ~ 15,
                                                 lter %in% c("BNZ", "LUQ") ~ 16,
@@ -72,6 +75,10 @@ sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
 
 # Glimpse it
 dplyr::glimpse(sync_df)
+
+## ------------------------------------------ ##
+        # Wrangle - Species Traits ----
+## ------------------------------------------ ##
 
 # Read in trait information
 spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
@@ -118,6 +125,9 @@ spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
 # Glimpse it
 dplyr::glimpse(spp_traits)
 
+## ------------------------------------------ ##
+    # Wrangle - Observed vs. Permuted ----
+## ------------------------------------------ ##
 # Read in permutations of correlations
 perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
   # Cut off below overlap threshold
@@ -133,6 +143,9 @@ perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
 # Check out structure
 dplyr::glimpse(perm_df)
 
+## ------------------------------------------ ##
+          # Wrangle - MRM Results ----
+## ------------------------------------------ ##
 # Read in MRM results
 mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
   # Drop all but saturated model
@@ -155,6 +168,9 @@ mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
 # Glimpse it
 dplyr::glimpse(mrm_results)
 
+## ------------------------------------------ ##
+     # Wrangle - ANOVA Results (Main) ----
+## ------------------------------------------ ##
 # Read in ANOVA results too
 aov_results <- read.csv(file = file.path("tidy_data", aov_file)) %>%
   # Remove unwanted rows
@@ -188,6 +204,9 @@ aov_results <- read.csv(file = file.path("tidy_data", aov_file)) %>%
 # Glimpse it
 dplyr::glimpse(aov_results)
 
+## ------------------------------------------ ##
+   # Wrangle - ANOVA Results (Pairwise) ----
+## ------------------------------------------ ##
 # Read in pairwise comparisons results
 aov_pairs <- read.csv(file = file.path("tidy_data", pair_file)) %>%
   # Pare down to minimum needed columns
@@ -295,3 +314,6 @@ stat_aov <- read.csv(file.path("tidy_data", stat_aov_file)) %>%
 
 # Glimpse this
 dplyr::glimpse(stat_aov)
+
+# End ----
+
