@@ -836,6 +836,11 @@ for(sup5_site in unique(sync_df$lter)){
     # Pivot to long format
     tidyr::pivot_longer(cols = dplyr::ends_with("_shared"),
                         names_to = "trait", values_to = "value") %>%
+    # Make sure these traits match the trait status ones
+    dplyr::mutate(trait = dplyr::case_when(
+      trait == "Mycorrhiza_shared" ~ "Mycorrhizal_assoc._shared",
+      trait == "Leaf_Longevity_shared" ~ "Leaf_longevity_shared",
+      T ~ trait)) %>% 
     # Assign significance (identified by 'synchrony_mrm.R')
     dplyr::left_join(stat_aov, by = c("lter", "trait")) %>%
     # Tidy trait names for use as axis labels & make the value a factor
