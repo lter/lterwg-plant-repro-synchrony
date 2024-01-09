@@ -13,8 +13,41 @@
 # install.packages("librarian")
 librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot, magrittr)
 
+# Make sure R is authorized to work with GoogleDrive
+googledrive::drive_auth()
+
+# Run the entirety of the preparation script (if not already done so)
+## Takes ~2 minutes to complete
+source("synchrony_vis_prep.R")
+
 # Clear environment
 rm(list = ls())
+
+# Read in 'core' synchrony data
+sync_df <- read.csv(file = file.path("figure_data", "synchrony_viz-ready.csv"))
+
+# Read in species-specific trait information
+spp_traits <- read.csv(file = file.path("figure_data", "traits_viz-ready.csv"))
+
+# Read in permuted vs. observed correlations
+perm_df <- read.csv(file = file.path("figure_data", "perm_viz-ready.csv"))
+
+# Read in MRM results
+mrm_results <- read.csv(file = file.path("figure_data", "mrm_viz-ready.csv"))
+
+# Read in ANOVA on trait 'status' (i.e., shared vs. unshared)
+stat_aov <- read.csv(file = file.path("figure_data", "aov-status_viz-ready.csv"))
+
+# Read in main results of ANOVA on trait 'levels' (i.e., actual trait values)
+aov_results <- read.csv(file = file.path("figure_data", "aov-levels_viz-ready.csv"))
+
+# Read in pairwise results of levels ANOVA
+aov_pairs <- read.csv(file = file.path("figure_data", "aov-levels-pairs_viz-ready.csv"))
+
+# Read in compact letter display for pairwise comparisons of levels ANOVA
+aov_cld <- read.csv(file = file.path("figure_data", "aov-levels-cld_viz-ready.csv"))
+
+
 
 # Identify names of files this script requires
 sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
