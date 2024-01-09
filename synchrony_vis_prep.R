@@ -46,6 +46,7 @@ stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1
 
 # Create folder to download files into
 dir.create(path = file.path("tidy_data"), showWarnings = F)
+dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
@@ -75,6 +76,10 @@ sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
 
 # Glimpse it
 dplyr::glimpse(sync_df)
+
+# Export locally
+write.csv(x = sync_df, na = '', row.names = F,
+          file = file.path("figure_data", "synchrony_viz-ready.csv"))
 
 ## ------------------------------------------ ##
         # Wrangle - Species Traits ----
@@ -125,6 +130,10 @@ spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
 # Glimpse it
 dplyr::glimpse(spp_traits)
 
+# Export locally
+write.csv(x = spp_traits, na = '', row.names = F,
+          file = file.path("figure_data", "traits_viz-ready.csv"))
+
 ## ------------------------------------------ ##
     # Wrangle - Observed vs. Permuted ----
 ## ------------------------------------------ ##
@@ -143,6 +152,10 @@ perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
 # Check out structure
 dplyr::glimpse(perm_df)
 
+# Export locally
+write.csv(x = perm_df, na = '', row.names = F,
+          file = file.path("figure_data", "perm_viz-ready.csv"))
+
 ## ------------------------------------------ ##
           # Wrangle - MRM Results ----
 ## ------------------------------------------ ##
@@ -153,14 +166,12 @@ mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
   # Make coefficient column match trait name
   dplyr::mutate(coef = gsub(pattern = "dist\\(|\\)", replacement = "", x = coef)) %>%
   # Determine result (sig vs. NS)
-  dplyr::mutate(result = ifelse(test = (pval < 0.05),
-                                yes = "sig", no = "NS")) %>%
+  dplyr::mutate(result = ifelse(test = (pval < 0.05), yes = "sig", no = "NS")) %>%
   # Pare down to minimum needed columns
   dplyr::select(lter, coef, result) %>%
   # Need to identify missing trait-site combinations
   ## Can leverage `values_fill` argument in `pivot_wider` to do this *very* quickly
-  tidyr::pivot_wider(names_from = coef, values_from = result,
-                     values_fill = "NA") %>%
+  tidyr::pivot_wider(names_from = coef, values_from = result, values_fill = "NA") %>%
   tidyr::pivot_longer(cols = -lter, names_to = "trait", values_to = "result") %>%
   # Filter to only the across site model
   dplyr::filter(lter == "All")
@@ -168,8 +179,12 @@ mrm_results <- read.csv(file = file.path("tidy_data", mrm_file)) %>%
 # Glimpse it
 dplyr::glimpse(mrm_results)
 
+# Export locally
+write.csv(x = mrm_results, na = '', row.names = F,
+          file = file.path("figure_data", "mrm_viz-ready.csv"))
+
 ## ------------------------------------------ ##
-     # Wrangle - ANOVA Results (Main) ----
+    # Wrangle - ANOVA on 'Levels' (Main) ----
 ## ------------------------------------------ ##
 # Read in ANOVA results too
 aov_results <- read.csv(file = file.path("tidy_data", aov_file)) %>%
@@ -190,22 +205,28 @@ aov_results <- read.csv(file = file.path("tidy_data", aov_file)) %>%
                                           TRUE ~ "NS")) %>%
   # Wrangle P value for use as a label in plots
   dplyr::mutate(P_round = as.character(round(P, digits = 12))) %>%
-  dplyr::mutate(
-    P_label = dplyr::case_when(as.numeric(P_round) < 0.001 ~ "P < 0.001",
-                               as.numeric(P_round) > 990 ~ "",
-                               as.numeric(P_round) >= 0.05 & 
-                                 as.numeric(P_round) < 900 ~ "NS",
-                               as.numeric(P_round) >= 0.001 &
-                                 as.numeric(P_round) < 0.05 ~ paste0("P = ",
-                                                                     stringr::str_sub(string = P_round, start = 1,  end = 5)))) %>%
+  dplyr::mutate(P_label = dplyr::case_when(
+    as.numeric(P_round) < 0.001 ~ "P < 0.001",
+    as.numeric(P_round) > 990 ~ "",
+    as.numeric(P_round) >= 0.05 & as.numeric(P_round) < 900 ~ "NS",
+    as.numeric(P_round) >= 0.001 & as.numeric(P_round) < 0.05 ~ paste0("P = ", stringr::str_sub(string = P_round, start = 1,  end = 5)))) %>%
   # Drop unwanted columns
-  dplyr::select(-P_round, -P)
+  dplyr::select(-P_round, -P) %>% 
+  # Tweak leaf longevity values
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "Mycorrhiza_values" ~ "Mycorrhizal_assoc._values",
+    trait == "Deciduous_Evergreen_values" ~ "Leaf_longevity_values",
+    T ~ trait))
 
 # Glimpse it
 dplyr::glimpse(aov_results)
 
+# Export locally
+write.csv(x = aov_results, na = '', row.names = F,
+          file = file.path("figure_data", "aov-levels_viz-ready.csv"))
+
 ## ------------------------------------------ ##
-   # Wrangle - ANOVA Results (Pairwise) ----
+      # ANOVA on 'Levels' (Pairwise) ----
 ## ------------------------------------------ ##
 # Read in pairwise comparisons results
 aov_pairs <- read.csv(file = file.path("tidy_data", pair_file)) %>%
@@ -216,7 +237,13 @@ aov_pairs <- read.csv(file = file.path("tidy_data", pair_file)) %>%
   # Make the pairs non hyphenated
   dplyr::mutate(pairs = gsub(pattern = "\\-", replacement = "_", x = pairs)) %>%
   # Separate pairs into two columns
-  tidyr::separate(col = pairs, into = c("pair1", "pair2"), sep = ":")
+  tidyr::separate_wider_delim(cols = pairs, delim = ":", cols_remove = T,
+                              names = c("pair1", "pair2")) %>% 
+  # Do any desired manual tweaks of the trait names
+  dplyr::mutate(model = dplyr::case_when(
+    model == "mycorrhiza values" ~ "mycorrhizal assoc. values",
+    model == "deciduous evergreen values" ~ "leaf longevity values",
+    T ~ model))
 
 # Glimpse it
 dplyr::glimpse(aov_pairs)
@@ -282,6 +309,13 @@ aov_cld <- purrr::list_rbind(x = aov_cld_list)
 # Glimpse this
 dplyr::glimpse(aov_cld)
 
+# Export locally
+write.csv(x = aov_cld, na = '', row.names = F,
+          file = file.path("figure_data", "aov-levels-cld_viz-ready.csv"))
+
+## ------------------------------------------ ##
+      # Wrangle - ANOVA on 'Status' ----
+## ------------------------------------------ ##
 # Read in trait status ANOVA results too
 stat_aov <- read.csv(file.path("tidy_data", stat_aov_file)) %>%
   # Pare down to minimum needed columns
@@ -310,10 +344,19 @@ stat_aov <- read.csv(file.path("tidy_data", stat_aov_file)) %>%
                                  as.numeric(P_round) < 0.05 ~ paste0("P = ",
                                                                      stringr::str_sub(string = P_round, start = 1,  end = 5)))) %>%
   # Drop unwanted columns
-  dplyr::select(-P_round, -P)
+  dplyr::select(-P_round, -P) %>% 
+  # Tweak leaf longevity values
+  dplyr::mutate(trait = dplyr::case_when(
+    trait == "Mycorrhiza_shared" ~ "Mycorrhizal_assoc._shared",
+    trait == "Deciduous_Evergreen_shared" ~ "Leaf_longevity_shared",
+    T ~ trait))
 
 # Glimpse this
 dplyr::glimpse(stat_aov)
+
+# Export locally
+write.csv(x = aov_cld, na = '', row.names = F,
+          file = file.path("figure_data", "aov-status_viz-ready.csv"))
 
 # End ----
 
