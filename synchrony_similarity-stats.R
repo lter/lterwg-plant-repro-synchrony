@@ -40,7 +40,7 @@ purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
                                                 overwrite = T))
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("figure_data", sync_file))
+sync_df <- read.csv(file = file.path("tidy_data", sync_file))
 
 # Glimpse it
 dplyr::glimpse(sync_df)
