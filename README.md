@@ -7,7 +7,7 @@ David F. Greene; Department of Forestry, Fire, and Range Management. Cal Poly Hu
 E. Penelope Holland; Department of Biology, University of York, York, UK
 Jill F. Johnstone; Institute of Arctic Biology, University of Alaska Fairbanks, Fairbanks, AK, USA
 Mark Schulze; H.J. Andrews Experimental Forest, Oregon State University; Blue River, OR, USA
-Jess K.Zimmerman; Department of Environmental Sciences, University of Puerto Rico, San Juan, PR, USA
+Jess K. Zimmerman; Department of Environmental Sciences, University of Puerto Rico, San Juan, PR, USA
 Nicholas J. Lyon; ; Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA
 Angel Chen; Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA
 Tom E.X. Miller; Department of BioSciences, Rice University, Houston, TX USA
