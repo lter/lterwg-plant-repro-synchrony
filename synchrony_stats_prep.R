@@ -265,8 +265,11 @@ merge_cor <- pair_cor %>%
                               yes = paste0(Seed_bank_Sp1, "-", Seed_bank_Sp2),
                               no = paste0(Seed_bank_Sp2, "-", Seed_bank_Sp1)) ) %>%
   # Pare down to only needed columns
-  dplyr::select(lter:overlap, contains("shared"), contains("similarity"), contains("values"),
-                Seed_mass_Sp1, Seed_mass_Sp2, CV_Sp1, CV_Sp2, ACL1_Sp1, ACL1_Sp2)
+  dplyr::select(lter:overlap, contains("shared"), contains("similarity"), 
+                contains("values"), Seed_mass_Sp1, Seed_mass_Sp2) %>% 
+  # Drop some unwanted columns specifically
+  dplyr::select(-r.pearson, -r.spearman.detrend, -r.pearson.detrend,
+                -CV_similarity, -ACL1_similarity)
 
 # Glimpse this
 dplyr::glimpse(merge_cor)
@@ -373,7 +376,9 @@ clim <- read.csv(file.path("source_data", "climateSites_tidy_ANDupdate.csv")) %>
   # Drop Adirondack
   dplyr::filter(lter != "ADK") %>%
   # Remove duplicate rows (if any)
-  dplyr::distinct()
+  dplyr::distinct() %>% 
+  # Drop unwanted climate information
+  dplyr::select(-MAP_mean, -MAT, -TMAX, -TMIN, -Tdiff, -AET_SD, -MAT_SD, -CWD)
 
 # Read in special climate sites data
 clim_plots <- read.csv(file.path("source_data", "plot_data_ClimateSites.csv")) %>%
