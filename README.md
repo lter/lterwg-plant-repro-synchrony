@@ -1,12 +1,30 @@
-# Cross-species synchrony in mast seeding in 103 woody plant species: Functional traits, climate, and geographic patterns
+# Community synchrony in seed production is associated with trait similarity and climate across North America
 
 ## Authors
 
-Under Construction!
+Jalene M. LaMontagne; Department of Biological Sciences, DePaul University, Chicago, IL. USA
+David F. Greene; Department of Forestry, Fire, and Range Management. Cal Poly Humboldt, Arcata, CA, USA
+E. Penelope Holland; Department of Biology, University of York, York, UK
+Jill F. Johnstone; Institute of Arctic Biology, University of Alaska Fairbanks, Fairbanks, AK, USA
+Mark Schulze; H.J. Andrews Experimental Forest, Oregon State University; Blue River, OR, USA
+Jess K.Zimmerman; Department of Environmental Sciences, University of Puerto Rico, San Juan, PR, USA
+Nicholas J. Lyon; ; Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA
+Angel Chen; Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA
+Tom E.X. Miller; Department of BioSciences, Rice University, Houston, TX USA
+Katherine M. Nigro; ORISE Postdoctoral fellow, Rocky Mountain Research Station, USDA Forest Service, Fort Collins, CO, USA
+Rebecca S. Snell; Department of Environmental and Plant Biology, Ohio University, Athens, OH, USA
+Jessica H. Barton; Department of Biological Sciences, DePaul University, Chicago, IL. USA
+V. Bala Chaudhary; Environmental Studies Department, Dartmouth College, Hanover, NH, USA
+Natalie L. Cleavitt; Department of Natural Resources and the Environment, Cornell University, Ithaca, NY, USA
+Elizabeth E. Crone; Department of Evolution & Ecology, University of California, Davis CA 95618 USA
+Walter D. Koenig; Hastings Reservation, University of California Berkeley, Carmel Valley, CA, USA
+Diana Macias; Department of Environmental Science, Policy, and Management. University of California Berkeley, Berkeley, CA
+Ian S. Pearse; U.S. Geological Survey, Fort Collins Science Center, Fort Collins, CO, USA
+Miranda D. Redmond; Department of Environmental Science, Policy, and Management. University of California Berkeley, Berkeley, CA, USA
 
-## Abstract
+## Abstract (from manuscript)
 
-Under Construction!
+Mast seeding, the synchronous and highly variable production of seed crops in perennial plants, is a population level phenomenon and has cascading effects in ecosystems. Mast seeding studies are typically conducted at the population/species level. Much less is known about synchrony in mast seeding between species because the necessary long-term data are rarely available. To investigate synchrony between species within communities, we used long-term data from seven forest communities in the US Long-Term Ecological Research (LTER) network, ranging from tropical rainforest to taiga. We focus on cross-species synchrony and i) quantify synchrony in reproduction overall and within LTER sites, ii) test for relationships between synchrony with trait and phylogenetic similarity, and iii) investigate how climate conditions are related to levels of synchrony. Overall, synchrony in reproduction between woody plant species was greater than expected by chance, but also spanned a wide range of values between species. Based on 11 traits for 103 species (plus phylogenetic information), cross-species synchrony in reproduction was driven primarily by trait similarity with phylogeny being largely unimportant, and synchrony was higher in sites with greater climatic water deficit. Synchronous masting within a community has consequences for understanding forest regeneration dynamics and consumer-resource interactions.
 
 ## Script Explanations
 
