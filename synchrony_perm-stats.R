@@ -47,7 +47,7 @@ purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
   # Pare down to needed columns
   dplyr::select(lter, Plot.ID, Species1, Species2, r.spearman) %>%
   # Drop non-unique rows (shouldn't be any but better safe than sorry)
@@ -59,7 +59,7 @@ sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in permutations of correlations
-perm_df <- read.csv(file = file.path("figure_data", perm_file)) %>%
+perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
   # Cut off below overlap threshold
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
