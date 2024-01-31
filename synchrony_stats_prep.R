@@ -392,7 +392,12 @@ clim_plots <- read.csv(file.path("source_data", "plot_data_ClimateSites.csv")) %
   # Remove duplicate rows (if any)
   dplyr::distinct() %>%
   # Create an LTER specific plot ID column
-  dplyr::mutate(lter_plot = paste0(lter, "__", supersite))
+  dplyr::mutate(lter_plot = paste0(lter, "__", supersite)) %>% 
+  # Average coordinates within established plots
+  dplyr::group_by(lter, supersite, climatesite, lter_plot) %>% 
+  dplyr::summarize(Latitude_dd = mean(Latitude_dd, na.rm = T),
+                   Longitude_dd = mean(Longitude_dd, na.rm = T)) %>% 
+  dplyr::ungroup()
   
 # Look at both
 dplyr::glimpse(clim)
@@ -402,11 +407,10 @@ dplyr::glimpse(pc_sync_df)
 # Merge climate plots with rest of (non-climate) data
 merged <- pc_sync_df %>%
   # Create the LTER + plot column in the climate plot dataframe
-  dplyr::mutate(lter_plot = paste0(lter, "__", Plot.ID)) %>%
+  dplyr::mutate(lter_plot = paste0(lter, "__", Plot.ID),
+                .before = dplyr::everything()) %>%
   # Do the merging
-  dplyr::left_join(y = clim_plots, 
-                   by = c("lter", "Plot.ID" = "supersite", "lter_plot"), 
-                   multiple = "all", relationship = "many-to-many")
+  dplyr::left_join(y = clim_plots, by = c("lter", "Plot.ID" = "supersite", "lter_plot"))
 
 # Now combine *that* with the actual climate data
 pc_clim_sync_df <- merged %>%
