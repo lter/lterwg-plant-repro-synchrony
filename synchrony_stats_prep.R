@@ -14,45 +14,14 @@
 # install.packages("librarian")
 librarian::shelf(googledrive, tidyverse, supportR)
 
-## ------------------------------------------ ##
-              # Download Data ----
-## ------------------------------------------ ##
-
-# Identify tidy file(s) to download
-tidy_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE"), type = "csv") %>%
-  # Filter to desired files
-  dplyr::filter(name %in% c("pairwise_corr.csv", "masting_summary_stats.csv"))
-
-# Identify trait file(s) to download
-trait_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1PGaPAkNz1lmvZQMwwthmS-ZjQ97BS2Am"), type = "csv") %>%
-  # Filter to desired files
-  dplyr::filter(name %in% c("LTER_integrated_attributes_USDA_2022-12-14.csv"))
-
-# Identify phylogenetic distance file(s) to download
-phylo_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1IVY6i79REaF59kZEBbrJCRNOlcxE7Tel"), type = "csv") %>%
-  # Filter to desired files
-  dplyr::filter(name %in% c("phylo distance matrix.csv"))
-
-# Combine these file sets
-wanted_files <- tidy_files %>%
-  dplyr::bind_rows(trait_files) %>%
-  dplyr::bind_rows(phylo_files)
-
-# Check this out to make sure it includes all files that we need
-wanted_files
-
-# Create a folder to write these files to
-dir.create(path = file.path("source_data"), showWarnings = F)
-
-# Download these files into that folder
-purrr::walk2(.x = wanted_files$id,
-             .y = wanted_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x),
-                                                path = file.path("source_data", .y),
-                                                overwrite = T))
+# Clear environment
+rm(list = ls())
 
 # Make a folder to export processed data in
 dir.create(path = file.path("tidy_data"), showWarnings = F)
+
+# NOTE ON SOURCE DATA
+## Place data downloaded from FigShare in folder named "source_data"
 
 ## ------------------------------------------ ##
           # Prepare to Merge Data ----
@@ -302,11 +271,6 @@ dplyr::glimpse(sync_df)
 write.csv(x = sync_df, file = file.path("tidy_data", "synchrony_data.csv"),
           row.names = F, na = '')
 
-# Upload this to the Drive
-googledrive::drive_upload(media = file.path("tidy_data", "synchrony_data.csv"),
-                          path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"),
-                          overwrite = TRUE)
-
 # Partially clear environment
 rm(list = c("mast_summary", "mast_v2", "merge_cor", "pair_cor", "phylo",  "phylo_v2", 
             "overlap_thresh", "phylo_files", "tidy_files", "trait_files", "traits", 
@@ -315,15 +279,6 @@ rm(list = c("mast_summary", "mast_v2", "merge_cor", "pair_cor", "phylo",  "phylo
 ## ------------------------------------------ ##
     # Synchrony + PCoA Diff Creation ----
 ## ------------------------------------------ ##
-
-# Identify PCoA axis values in Drive
-pc_file <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
-  # Filter to desired file
-  dplyr::filter(name == "trait_space_pcoa_axes.csv")
-
-# Download PCoA axis values CSV
-googledrive::drive_download(file = pc_file$id, overwrite = T, 
-                            path = file.path("source_data", pc_file$name))
 
 # Read in
 pc_axes <- read.csv(file.path("source_data", "trait_space_pcoa_axes.csv"))
@@ -348,25 +303,9 @@ dplyr::glimpse(pc_sync_df)
 write.csv(pc_sync_df, file = file.path("tidy_data", "synchrony_pcoa_combination.csv"), 
           row.names = F, na = '')
 
-# Upload to Drive
-googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("tidy_data", "synchrony_pcoa_combination.csv"), overwrite = T)
-
 ## ------------------------------------------ ##
   # Synchrony + PCoA + Climate Creation ----
 ## ------------------------------------------ ##
-
-# Identify climate files
-clim_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/folders/1tPM28pofJbpKXod3rXq-QEqjxGcU8xgt"), type = "csv") %>%
-  dplyr::filter(name %in% c("climateSites_tidy_ANDupdate.csv", "plot_data_ClimateSites.csv"))
-
-# Check out files
-clim_files
-
-# Download climate data and climate plot info
-purrr::walk2(.x = clim_files$id, .y = clim_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x),
-                                                path = file.path("source_data", .y),
-                                                overwrite = T))
 
 # Read in climate data
 clim <- read.csv(file.path("source_data", "climateSites_tidy_ANDupdate.csv")) %>%
@@ -436,8 +375,5 @@ dplyr::glimpse(pc_clim_sync_df)
 # Export locally
 write.csv(pc_clim_sync_df, row.names = F, na = '',
           file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv"))
-
-# Upload to Drive
-googledrive::drive_upload(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), media = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv"), overwrite = T)
 
 # End ----
