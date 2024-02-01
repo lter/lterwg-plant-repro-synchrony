@@ -40,13 +40,13 @@ wanted_files2 <- googledrive::drive_ls(path = att_folder, type = "csv") %>%
 (wanted_files <- rbind(wanted_files1, wanted_files2))
 
 # Create folder to download files into
-dir.create(path = file.path("figure_data"), showWarnings = F)
+dir.create(path = file.path("tidy_data"), showWarnings = F)
 
 # Download files into that folder
 purrr::walk2(.x = wanted_files$id, 
              .y = wanted_files$name,
              .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("figure_data", .y),
+                                                path = file.path("tidy_data", .y),
                                                 overwrite = T))
 
 # Make a folder to export tables to
@@ -57,7 +57,7 @@ dir.create(path = file.path("table_data"), showWarnings = F)
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1) %>%
@@ -73,7 +73,7 @@ sync_df <- read.csv(file = file.path("figure_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in trait information
-spp_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
+spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
   # Pivot to long format
   tidyr::pivot_longer(cols = -lter:-Species.Name,
                       names_to = "trait", values_to = "trait_value") %>%
@@ -206,11 +206,11 @@ for(trait in trait_vals){
 # ------------------------------- Data Prep ------------------------------------
 
 # Read in the pre ordination trait data
-pre_ord_traits <- read.csv(file = file.path("figure_data", trait_file)) %>%
+pre_ord_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
   mutate(Species.Name = gsub("\\."," ", Species.Name)) 
 
 # Read in the full trait data
-all_traits <- read.csv(file = file.path("figure_data", full_trait_file)) 
+all_traits <- read.csv(file = file.path("tidy_data", full_trait_file)) 
 
 # Grab the exact seed mass values 
 seed_mass <- all_traits %>%
