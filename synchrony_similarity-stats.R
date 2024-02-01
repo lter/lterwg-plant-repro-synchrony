@@ -17,8 +17,7 @@ librarian::shelf(tidyverse, RRPP)
 # Clear environment
 rm(list = ls())
 
-# Create needed local folders
-dir.create(path = file.path("tidy_data"), showWarnings = F)
+# Create needed local folder(s)
 dir.create(path = file.path("stats_results"), showWarnings = F)
 
 # Read in synchrony data

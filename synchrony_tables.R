@@ -16,8 +16,7 @@ librarian::shelf(tidyverse, supportR, rstatix)
 # Clear environment
 rm(list = ls())
 
-# Create needed local folders
-dir.create(path = file.path("tidy_data"), showWarnings = F)
+# Create needed local folder(s)
 dir.create(path = file.path("table_data"), showWarnings = F)
 
 ## ------------------------------------------ ##

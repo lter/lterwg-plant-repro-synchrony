@@ -17,11 +17,13 @@ librarian::shelf(tidyverse, supportR)
 # Clear environment
 rm(list = ls())
 
-# Make a folder to export processed data in
+# Create needed local folder(s)
+dir.create(path = file.path("source_data"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 
 # NOTE ON SOURCE DATA
-## Place data downloaded from FigShare in folder named "source_data"
+## Place data downloaded from FigShare in the folder named "source_data"
+## FigShare DOI is as follows: "10.6084/m9.figshare.25112972"
 
 ## ------------------------------------------ ##
           # Prepare to Merge Data ----

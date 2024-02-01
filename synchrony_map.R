@@ -19,8 +19,9 @@ rm(list = ls())
 # This map is very data hungry so we'll need to do garbage collection too
 gc()
 
-# Create a folder to store necessary files (if it doesn't already exist)
+# Create needed local folder(s)
 dir.create(path = file.path("map_data"), showWarnings = F)
+dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
 
 # Gather up some needed plotting aesthetics
 # Site palette
@@ -113,14 +114,8 @@ fig1c <- combo %>%
 # Add label on the map
 cowplot::plot_grid(fig1c, labels = c("C"), nrow = 1)
 
-# Make sure that the figure folder exists
-dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
-
-# Name the map file
-map_name <- "sync_fig1C_map.png"
-
 # Save locally
-ggsave(filename = file.path("synchrony_figure_files", map_name),
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig1C_map.png"),
        plot = last_plot(), width = 6, height = 6, units = "in", dpi = 420)
 
 # Clean up environment and collect garbage to speed R up going forward

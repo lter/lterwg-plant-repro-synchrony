@@ -13,6 +13,9 @@
 # install.packages("librarian")
 librarian::shelf(tidyverse, see, vegan, supportR, cowplot, magrittr)
 
+# Create needed local folder(s)
+dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
+
 # Run the entirety of the preparation script (if not already done so)
 ## Takes ~2 minutes to complete
 source("synchrony_vis_prep.R")
@@ -49,9 +52,6 @@ aov_cld <- read.csv(file = file.path("figure_data", "aov-levels-cld_viz-ready.cs
 ## ------------------------------------------ ##
     # Graph Aesthetic Standardization ----
 ## ------------------------------------------ ##
-
-# Create a local folder to export figures & supplemental figures to
-dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
 
 # Define color palettes
 # Site palette

@@ -18,10 +18,7 @@ librarian::shelf(tidyverse, ecodist)
 # Clear environment
 rm(list = ls())
 
-# Create tidy data folder if it doesn't exist
-dir.create(path = file.path("tidy_data"), showWarnings = F)
-
-# Create a local folder for exporting results to
+# Create needed local folder(s)
 dir.create(path = file.path("stats_results"), showWarnings = F)
 
 # Read in that file

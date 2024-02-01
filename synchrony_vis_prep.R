@@ -17,8 +17,7 @@ librarian::shelf(tidyverse, supportR, magrittr)
 # Clear environment
 rm(list = ls())
 
-# Create needed local folders
-dir.create(path = file.path("tidy_data"), showWarnings = F)
+# Create needed local folder(s)
 dir.create(path = file.path("figure_data"), showWarnings = F)
 
 # Identify any file names with time stamps

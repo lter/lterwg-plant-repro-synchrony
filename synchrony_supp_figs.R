@@ -16,6 +16,9 @@ librarian::shelf(tidyverse, sf, see, maps, vegan, njlyon0/supportR, cowplot, mul
 # Clear environment
 rm(list = ls())
 
+# Create needed local folder(s)
+dir.create(path = file.path("synchrony_supp_figures"), showWarnings = F)
+
 # Run the entirety of the preparation script (if not already done so)
 ## Takes ~2 minutes to complete
 source("synchrony_vis_prep.R")
@@ -46,9 +49,6 @@ aov_pairs <- read.csv(file = file.path("figure_data", "aov-levels-pairs_viz-read
 
 # Read in compact letter display for pairwise comparisons of levels ANOVA
 aov_cld <- read.csv(file = file.path("figure_data", "aov-levels-cld_viz-ready.csv"))
-
-# Create a local folder to export supplemental figures to
-dir.create(path = file.path("synchrony_supp_figures"), showWarnings = F)
 
 # Define color palettes
 ## Site palette
