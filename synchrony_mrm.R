@@ -13,7 +13,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, ecodist)
+librarian::shelf(tidyverse, ecodist)
 
 # Clear environment
 rm(list = ls())
@@ -21,13 +21,8 @@ rm(list = ls())
 # Create tidy data folder if it doesn't exist
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 
-# Identify prepared data
-## See "synchrony_data_prep.R" for how this file is created
-sync_file <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
-  dplyr::filter(name == "synchrony_data.csv")
-
-# Download it
-googledrive::drive_download(file = sync_file$id, path = file.path("tidy_data", sync_file$name), overwrite = T)
+# Create a local folder for exporting results to
+dir.create(path = file.path("stats_results"), showWarnings = F)
 
 # Read in that file
 sync_df <- read.csv(file = file.path("tidy_data", "synchrony_data.csv")) %>%
@@ -45,9 +40,6 @@ pair_avg_df <- sync_df %>%
   # Average if numeric, pick first if categorical
   ## "First" doesn't matter because all species pairs would have same value
   dplyr::summarize(r.spearman = mean(r.spearman, na.rm = T),
-                   r.pearson = mean(r.pearson, na.rm = T),
-                   r.spearman.detrend = mean(r.spearman.detrend, na.rm = T),
-                   r.pearson.detrend = mean(r.pearson.detrend, na.rm = T),
                    overlap = mean(overlap, na.rm = T),
                    Pollinator_code_shared = dplyr::first(Pollinator_code_shared),
                    Seed_development_shared = dplyr::first(Seed_development_shared),
@@ -61,8 +53,6 @@ pair_avg_df <- sync_df %>%
                    Fleshy_fruit_shared = dplyr::first(Fleshy_fruit_shared),
                    Seed_bank_shared = dplyr::first(Seed_bank_shared),
                    Seed_mass_similarity = mean(Seed_mass_similarity, na.rm = T),
-                   CV_similarity = mean(CV_similarity, na.rm = T),
-                   ACL1_similarity = mean(ACL1_similarity, na.rm = T),
                    Phylogenetic_similarity = mean(Phylogenetic_similarity, na.rm = T))
 
 # Check this out
@@ -72,22 +62,11 @@ dplyr::glimpse(pair_avg_df)
 nrow(sync_df) - nrow(pair_avg_df)
 
 # Export this to locally and to the Drive
-write.csv(x = pair_avg_df, file = file.path("tidy_data", "synchrony_data_spp_averages.csv"), 
-          row.names = F, na = '')
-googledrive::drive_upload(media = file.path("tidy_data", "synchrony_data_spp_averages.csv"), overwrite = T,
-                          path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"))
-
-# Identify output folder
-stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
-
-# Check its current contents
-googledrive::drive_ls(stats_drive)
+write.csv(x = pair_avg_df, row.names = F, na = '',
+          file = file.path("tidy_data", "synchrony_data_spp_averages.csv"))
 
 # Set permutation number
 perm_num <- 10000
-
-# Create a local folder for exporting results to
-dir.create(path = file.path("stats_results"), showWarnings = F)
 
 ## ------------------------------------------ ##
     # Helpful MRM Extraction Function ----
@@ -130,10 +109,8 @@ mrm_extract <- function(mrm_model = NULL, response_nickname = "dist_r_spearman")
 ## ------------------------------------------ ##
             # Fit MRMs - Full Data ----
 ## ------------------------------------------ ##
-
 # These MRMs are conducted on "raw" data (i.e., data that has been tidied/wrangled but 'duplicate' species pairs are allowed to exist within each LTER site)
 ## This is distinct from averages within species pairs (see below for those analyses)
-
 
 # Make a faux dataframe that we'll use if/when one of the models below errors out
 faux_out <- data.frame(coef = "MODEL FAILED",
@@ -477,14 +454,11 @@ dplyr::glimpse(total_df)
 (file_name <- paste0("MRM_not_averaged_results_", Sys.Date(), "_", perm_num, "perm.csv"))
 
 # Export as a CSV locally
-write.csv(x = total_df, file = file.path("stats_results", file_name), row.names = F, na = '')
-
-# Upload this CSV there
-googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
+write.csv(x = total_df, row.names = F, na = '', 
+          file = file.path("stats_results", file_name))
 
 # Clear environment of almost everything
-rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "stats_drive", 
-                          "perm_num", "mrm_extract")))
+rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "perm_num", "mrm_extract")))
 
 ## ------------------------------------------ ##
     # Sensitivity Analysis - Full Data ----
@@ -762,9 +736,7 @@ for(exclude_site in unique(sync_df$lter)) {
      # Sensitivity Export - Full Data ----
 ## ------------------------------------------ ##
 # Process the big list we're left with
-sens_df <- sens_out %>%
-  # Unlist
-  purrr::list_rbind(x = .)
+sens_df <- purrr::list_rbind(x = sens_out) %>%
 
 # Check this out
 dplyr::glimpse(sens_df)
@@ -775,12 +747,8 @@ dplyr::glimpse(sens_df)
 # Export as a CSV locally
 write.csv(x = sens_df, file = file.path("stats_results", file_name), row.names = F, na = '')
 
-# Upload this CSV there
-googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
-
 # Clear environment of almost everything
-rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "stats_drive", 
-                          "perm_num", "mrm_extract")))
+rm(list = setdiff(ls(), c("sync_df", "pair_avg_df", "perm_num", "mrm_extract")))
 
 # End ----
 

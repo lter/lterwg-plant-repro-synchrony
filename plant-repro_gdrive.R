@@ -23,6 +23,7 @@ rm(list = ls())
 # Create needed local folders
 dir.create(path = file.path("source_data"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
+dir.create(path = file.path("stats_results"), showWarnings = F)
 
 ## ------------------------------------------ ##
           # 1 - Statistics Prep ----
@@ -58,14 +59,11 @@ clim_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com
   dplyr::filter(name %in% c("climateSites_tidy_ANDupdate.csv", "plot_data_ClimateSites.csv"))
 
 # Combine these file sets
-wanted_files <- tidy_files %>%
+(wanted_files <- tidy_files %>%
   dplyr::bind_rows(trait_files) %>%
   dplyr::bind_rows(phylo_files) %>% 
   dplyr::bind_rows(pc_file) %>% 
-  dplyr::bind_rows(clim_files)
-
-# Check this out to make sure it includes all files that we need
-wanted_files
+  dplyr::bind_rows(clim_files) )
 
 # Download these files into that folder
 purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
@@ -90,161 +88,86 @@ for(file in stats_prep_files){
   googledrive::drive_upload(media = file.path("tidy_data", file), overwrite = T,
                             path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) }
 
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
+          # 2 - MRM Analyses ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_mrm.R"
+
+# Identify needed data files
+data_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>% 
+  dplyr::filter(name %in% c("synchrony_data.csv"))
+
+# Combine all needed files into one object
+mrm_needs <- data_files
+
+# Download them
+purrr::walk2(.x = mrm_needs$id, .y = mrm_needs$name,
+             .f = ~ googledrive::drive_download(file = .x, overwrite = T,
+                                                path = file.path("tidy_data", .y)))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+# Upload
+## -------------------------- ##
+## Run *after* "synchrony_mrm.R"
+
+# Upload the species pair averages data
+googledrive::drive_upload(media = file.path("tidy_data", "synchrony_data_spp_averages.csv"),
+                          overwrite = T,
+                          path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"))
+
+# Identify all statistical result files
+stat_outs <- dir(path = file.path("stats_results"))
+
+# Winnow to only the MRM results
+mrm_outs <- stat_outs[stringr::str_detect(string = stat_outs, pattern = "MRM_")]
+
+# Upload each to the Drive
+for(file in mrm_outs){
+  googledrive::drive_upload(media = file.path("stats_results", file), overwrite = T,
+                           path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")) }
+
+# Clear environment
+rm(list = ls())
 
 ## ------------------------------------------ ##
 # 2 - x ----
 ## ------------------------------------------ ##
-
 ## -------------------------- ##
 # Download
 ## -------------------------- ##
 ## Run *before* "synchrony_...R"
+
+# Identify needed data files
+
+
+# Combine all needed files into one object
+
+
+# Download them
+
+# Clear environment
+rm(list = ls())
 
 ## -------------------------- ##
 # Upload
 ## -------------------------- ##
 ## Run *after* "synchrony_...R"
 
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
+# Identify produced files
 
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
+# Upload each file
 
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
-## ------------------------------------------ ##
-# 2 - x ----
-## ------------------------------------------ ##
-
-## -------------------------- ##
-# Download
-## -------------------------- ##
-## Run *before* "synchrony_...R"
-
-## -------------------------- ##
-# Upload
-## -------------------------- ##
-## Run *after* "synchrony_...R"
-
+# Clear environment
+rm(list = ls())
 
 # End ----
 
