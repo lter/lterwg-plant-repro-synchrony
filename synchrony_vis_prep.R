@@ -12,54 +12,28 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, supportR, magrittr)
+librarian::shelf(tidyverse, supportR, magrittr)
 
 # Clear environment
 rm(list = ls())
 
-## ------------------------------------------ ##
-              # Data Download ----
-## ------------------------------------------ ##
-# Identify names of files this script requires
-sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-trait_file <- "pre_ordination_trait_data.csv" # trait data
-perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
-mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
-time_series_files <- c("series_andrews.csv", "series_bonanza.csv") # AND + BNZ time series info
-aov_file <- "ANOVA_trait_aov_tables_2023-06-14_10000perm.csv" # ANOVA results (trait levels)
-pair_file <- "ANOVA_trait_pairwise_comps_2023-06-14_10000perm.csv" # ANOVA pairwise comparisons
-stat_aov_file <- "ANOVA_trait_status_aov_tables_2023-06-14_10000perm.csv" # ANOVA on trait status (0 vs. 1)
-
-# Identify links of relevant Drive folders
-gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
-sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-stats_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
-
-# Identify relevant data from those folders
-## List out all CSVs in all folders
-(wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = stats_folder, type = "csv")) %>%
-    ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file, perm_file, mrm_file, 
-                              time_series_files, aov_file, pair_file, stat_aov_file)))
-
-# Create folder to download files into
+# Create needed local folders
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 dir.create(path = file.path("figure_data"), showWarnings = F)
 
-# Download files into that folder
-purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("tidy_data", .y),
-                                                overwrite = T))
+# Identify any file names with time stamps
+## Done here to make updating time stamps easier
+mrm_file <- "MRM_not_averaged_results_2023-06-14_10000perm.csv" # MRM results
+aov_file <- "ANOVA_trait_aov_tables_2023-06-14_10000perm.csv" # ANOVA results (trait levels)
+pair_file <- "ANOVA_trait_pairwise_comps_2023-06-14_10000perm.csv" # ANOVA pairwise comps
+stat_aov_file <- "ANOVA_trait_status_aov_tables_2023-06-14_10000perm.csv" # ANOVA on trait status (0 vs 1)
 
 ## ------------------------------------------ ##
         # Wrangle - Synchrony Data ----
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv")) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1) %>%
@@ -86,7 +60,7 @@ write.csv(x = sync_df, na = '', row.names = F,
 ## ------------------------------------------ ##
 
 # Read in trait information
-spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
+spp_traits <- read.csv(file = file.path("tidy_data", "pre_ordination_trait_data.csv")) %>%
   # Pivot to long format
   tidyr::pivot_longer(cols = -lter:-Species.Name,
                       names_to = "trait", values_to = "trait_value") %>%
@@ -138,7 +112,7 @@ write.csv(x = spp_traits, na = '', row.names = F,
     # Wrangle - Observed vs. Permuted ----
 ## ------------------------------------------ ##
 # Read in permutations of correlations
-perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
+perm_df <- read.csv(file = file.path("tidy_data", "permutation_corr_unsummarized.csv")) %>%
   # Cut off below overlap threshold
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
@@ -370,4 +344,3 @@ write.csv(x = stat_aov, na = '', row.names = F,
           file = file.path("figure_data", "aov-status_viz-ready.csv"))
 
 # End ----
-

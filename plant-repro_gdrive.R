@@ -409,6 +409,53 @@ for(map in map_out){
 rm(list = ls())
 
 ## ------------------------------------------ ##
+          # 9 - Visualization Prep ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_vis_prep.R"
+
+# Identify needed data files
+vis_files <- c("synchrony_pcoa_climate_combination.csv", "pre_ordination_trait_data.csv",
+               "permutation_corr_unsummarized.csv", "series_andrews.csv", 
+               "series_bonanza.csv")
+
+# Find all needed files in Drive
+(vis_needs <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
+  dplyr::bind_rows(googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE"), type = "csv")) %>%
+  dplyr::bind_rows(googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH"), type = "csv")) %>%
+  ## Filter to only desired files
+  dplyr::filter(name %in% c(vis_files) |
+                stringr::str_detect(string = name, pattern = "MRM_not_averaged_results_") |
+                  stringr::str_detect(string = name, pattern = "ANOVA_trait_")) )
+
+# Download them
+purrr::walk2(.x = vis_needs$id, .y = vis_needs$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("tidy_data", .y),
+                                                overwrite = T))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+          # Upload
+## -------------------------- ##
+## Run *after* "synchrony_vis_prep.R"
+
+# Identify produced files
+vis_outs <- dir(path = file.path("figure_data"))
+
+# Upload each file
+for(file in vis_outs){
+  googledrive::drive_upload(media = file.path("figure_data", file), overwrite = T,
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1tN5-GhlIWuEG7NKlaoVrUWAiLMG7agY2")) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
 # 4 - x ----
 ## ------------------------------------------ ##
 ## -------------------------- ##
@@ -438,7 +485,6 @@ rm(list = ls())
 
 # Clear environment
 rm(list = ls())
-
 
 
 
