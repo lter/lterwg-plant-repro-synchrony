@@ -24,9 +24,10 @@ rm(list = ls())
 dir.create(path = file.path("source_data"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 dir.create(path = file.path("stats_results"), showWarnings = F)
-dir.create(path = file.path("figure_data"), showWarnings = F)
 dir.create(path = file.path("table_data"), showWarnings = F)
 dir.create(path = file.path("map_data"), showWarnings = F)
+dir.create(path = file.path("figure_data"), showWarnings = F)
+dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
 
 ## ------------------------------------------ ##
           # 1 - Statistics Prep ----
@@ -456,12 +457,59 @@ for(file in vis_outs){
 rm(list = ls())
 
 ## ------------------------------------------ ##
-# 4 - x ----
+              # 10 - Figures ----
 ## ------------------------------------------ ##
 ## -------------------------- ##
-# Download
+          # Download
 ## -------------------------- ##
-## Run *before* "synchrony_.R"
+## Run *before* "synchrony_figures.R"
+
+# Identify needed pre-wrangled-for-visualization files
+vis_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1tN5-GhlIWuEG7NKlaoVrUWAiLMG7agY2"), type = "csv")
+
+# Identify time series files
+series_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")) %>%
+  dplyr::filter(name %in% c("series_andrews.csv", "series_bonanza.csv"))
+
+# Combine all needed files into one object
+(fig_needs <- vis_files %>% 
+  dplyr::bind_rows(series_files) )
+
+# Download them
+purrr::walk2(.x = fig_needs$id, .y = fig_needs$name,
+             .f = ~ googledrive::drive_download(file = .x, overwrite = T,
+                                                path = file.path("figure_data", .y)))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+          # Upload
+## -------------------------- ##
+## Run *after* "synchrony_figures.R"
+
+# Identify all figure outputs
+fig_outs <- dir(path = file.path("synchrony_figure_files"))
+
+# Remove the map (if present) as it is uploaded elsewhere
+graph_out <- fig_outs[stringr::str_detect(string = fig_outs, pattern = "_map.png") != T]
+
+# Upload to Google Drive
+for(fig in graph_out){
+  googledrive::drive_upload(media = file.path("synchrony_figure_files", fig),
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wZqCP-axj9KUfAaiPJsTamc03zsgngCY"),
+                            overwrite = T) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
+        # 11 - Supplemental Figures ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_supp_figs.R"
 
 # Identify needed data files
 
@@ -477,7 +525,7 @@ rm(list = ls())
 ## -------------------------- ##
 # Upload
 ## -------------------------- ##
-## Run *after* "synchrony_.R"
+## Run *after* "synchrony_supp_figs.R"
 
 # Identify produced files
 
@@ -485,9 +533,6 @@ rm(list = ls())
 
 # Clear environment
 rm(list = ls())
-
-
-
 
 # End ----
 

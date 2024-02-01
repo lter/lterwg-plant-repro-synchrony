@@ -11,10 +11,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, see, vegan, supportR, cowplot, magrittr)
-
-# Make sure R is authorized to work with GoogleDrive
-googledrive::drive_auth()
+librarian::shelf(tidyverse, see, vegan, supportR, cowplot, magrittr)
 
 # Run the entirety of the preparation script (if not already done so)
 ## Takes ~2 minutes to complete
@@ -90,16 +87,6 @@ sync_df %>%
   dplyr::group_by(lter, Plot.ID) %>% 
   dplyr::summarize(min_corr = min(r.spearman, na.rm = T),
                    max_corr = max(r.spearman, na.rm = T))
-
-# Identify the two site-specific time series that we need
-series_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")) %>% 
-  dplyr::filter(name %in% c("series_andrews.csv", "series_bonanza.csv"))
-
-# Download them
-purrr::walk2(.x = series_files$id, .y = series_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("figure_data", .y),
-                                                overwrite = T))
 
 # Read them in
 and_df <- read.csv(file.path("figure_data", "series_andrews.csv"))
@@ -708,20 +695,5 @@ ggsave(filename = file.path("synchrony_figure_files", "sync_fig6_ANOVA_results_l
 
 # Clean up  environment
 rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
-
-## ------------------------------------------ ##
-         # Export Figures to Drive ----
-## ------------------------------------------ ##
-
-# Identify folder to export plots to
-figure_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wZqCP-axj9KUfAaiPJsTamc03zsgngCY")
-
-# Identify figures that we have created
-figures <- dir(path = file.path("synchrony_figure_files"))
-
-# Upload each to the Drive (skipping the map if it's there)
-for(file in setdiff(figures, c("sync_fig1C_map.png"))){
-  googledrive::drive_upload(media = file.path("synchrony_figure_files", file),
-                            path = figure_folder, overwrite = T) }
 
 # End ----
