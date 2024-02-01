@@ -144,7 +144,7 @@ rm(list = ls())
 ## -------------------------- ##
           # Download
 ## -------------------------- ##
-## Run *before* "synchrony_...R"
+## Run *before* "synchrony_perm-stats.R"
 
 # Identify needed data files
 data_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
@@ -188,12 +188,55 @@ for(file in perm_stats_outs){
 rm(list = ls())
 
 ## ------------------------------------------ ##
-# 2 - x ----
+          # 4 - perANOVA Analyses ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_anova.R"
+
+# Identify needed data files
+sync_file <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")) %>%
+  dplyr::filter(name == "synchrony_data.csv")
+
+# Combine all needed files into one object
+(aov_needs <- sync_file )
+
+# Download them
+purrr::walk2(.x = aov_needs$id, .y = aov_needs$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("tidy_data", .y),
+                                                overwrite = T))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+            # Upload
+## -------------------------- ##
+## Run *after* "synchrony_anova.R"
+
+# Identify all statistical result files
+stat_outs <- dir(path = file.path("stats_results"))
+
+# Winnow to only the MRM results
+aov_outs <- stat_outs[stringr::str_detect(string = stat_outs, pattern = "ANOVA_trait_")]
+
+# Upload each to the Drive
+for(file in aov_outs){
+  googledrive::drive_upload(media = file.path("stats_results", file), overwrite = T,
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
+# 4 - x ----
 ## ------------------------------------------ ##
 ## -------------------------- ##
 # Download
 ## -------------------------- ##
-## Run *before* "synchrony_...R"
+## Run *before* "synchrony_.R"
 
 # Identify needed data files
 
@@ -209,7 +252,7 @@ rm(list = ls())
 ## -------------------------- ##
 # Upload
 ## -------------------------- ##
-## Run *after* "synchrony_...R"
+## Run *after* "synchrony_.R"
 
 # Identify produced files
 
@@ -217,6 +260,42 @@ rm(list = ls())
 
 # Clear environment
 rm(list = ls())
+
+## ------------------------------------------ ##
+# 4 - x ----
+## ------------------------------------------ ##
+## -------------------------- ##
+# Download
+## -------------------------- ##
+## Run *before* "synchrony_.R"
+
+# Identify needed data files
+
+
+# Combine all needed files into one object
+
+
+# Download them
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+# Upload
+## -------------------------- ##
+## Run *after* "synchrony_.R"
+
+# Identify produced files
+
+# Upload each file
+
+# Clear environment
+rm(list = ls())
+
+
+
+
+
 
 # End ----
 
