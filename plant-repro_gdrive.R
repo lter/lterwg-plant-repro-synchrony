@@ -259,20 +259,57 @@ rm(list = ls())
 ## -------------------------- ##
 ## Run *after* "synchrony_similarity-stats.R"
 
-# Identify produced files
-
-
-
-
-
 # Identify all statistical result files
 stat_outs <- dir(path = file.path("stats_results"))
 
-# Winnow to only the ANOVA results
+# Winnow to only the similarity results
 sim_outs <- stat_outs[stringr::str_detect(string = stat_outs, pattern = "trait-sim-results_")]
 
 # Upload each to the Drive
 for(file in sim_outs){
+  googledrive::drive_upload(media = file.path("stats_results", file), overwrite = T,
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
+    # 6 - Climate/Phylogeny Analyses ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_climate_trait_phylog-stats.R"
+
+# Identify needed data files
+data_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
+  dplyr::filter(name %in% c("synchrony_pcoa_climate_combination.csv"))
+
+# Combine all needed files into one object
+(phylog_needs <- data_files )
+
+# Download them
+purrr::walk2(.x = phylog_needs$id, .y = phylog_needs$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("tidy_data", .y),
+                                                overwrite = T))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+          # Upload
+## -------------------------- ##
+## Run *after* "synchrony_climate_trait_phylog-stats.R"
+
+# Identify all statistical result files
+stat_outs <- dir(path = file.path("stats_results"))
+
+# Winnow to only the mixed-effect results
+mix_outs <- stat_outs[stringr::str_detect(string = stat_outs, pattern = "mixed-effect-results_")]
+
+# Upload each to the Drive
+for(file in mix_outs){
   googledrive::drive_upload(media = file.path("stats_results", file), overwrite = T,
                             path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")) }
 
