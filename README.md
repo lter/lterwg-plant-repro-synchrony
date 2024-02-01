@@ -28,7 +28,7 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 ## Script Explanations
 
-### Core Workflow
+### Analysis
 
 1. **`synchrony_stats_prep`** - Absorb tidied mast seeding data and do pre-statistics preparatory wrangling. Tidying scripts housed in a different repository and will be published on in a different paper
 
@@ -41,6 +41,8 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 5. **`synchrony_similarity-stats`** - Performs perANOVA on the 'Jaccard variant' of trait similarity. "Variant" because the authors have made some tweaks to the calculation of this metric so it is similar to Jaccard but not technically the same thing. Requires data produced by <u>script 1</u>
 
 6. **`synchrony_climate_trait_phylog-stats`** - Performs linear mixed effects model of synchrony as related to trait similarity, phylogenetic relatedness, and climate variables. Requires data produced by <u>script 1</u>
+
+### Summary Calculation & Visualization
 
 7. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data produced by <u>script 1</u>
 
