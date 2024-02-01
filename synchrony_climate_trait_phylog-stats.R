@@ -52,15 +52,6 @@ fullmod <- lmerTest::lmer(r.spearman ~ scale(AET) + scale(CWD_log) + scale(Trait
 # Check model summary
 summary(fullmod)
 
-# Strip out the summary table
-full_out <- as.data.frame(summary(fullmod)$coefficients) %>% 
-  # Get the term into a real column (rather than row names)
-  dplyr::mutate(Term = rownames(.),
-                .before = dplyr::everything())
-
-# Drop rownames
-rownames(full_out) <- NULL
-
 # Fit climate variables only mod
 climateonlymod <- lmerTest::lmer(r.spearman ~ (AET) + (CWD_log) + (1|climatesite) + (1|speciespair),
                        data = pc_clim_sync_df_climsite)
@@ -68,14 +59,49 @@ climateonlymod <- lmerTest::lmer(r.spearman ~ (AET) + (CWD_log) + (1|climatesite
 # Check that model's summary
 summary(climateonlymod)
 
-# Strip out the summary table
+## ------------------------------------------ ##
+        # Process Model Outputs ----
+## ------------------------------------------ ##
+
+# Strip out the summary table for the full model
+full_out <- as.data.frame(summary(fullmod)$coefficients) %>% 
+  # Get the term into a real column (rather than row names)
+  dplyr::mutate(Term = rownames(.),
+                .before = dplyr::everything()) %>% 
+  # Rename the P value column without special characters
+  dplyr::rename(P = `Pr(>|t|)`)
+
+# Drop rownames
+rownames(full_out) <- NULL
+
+# Look good?
+full_out
+
+# Strip out the summary table for the 'climate only' model
 clim_out <- as.data.frame(summary(climateonlymod)$coefficients) %>% 
   # Get the term into a real column (rather than row names)
   dplyr::mutate(Term = rownames(.),
-                .before = dplyr::everything())
+                .before = dplyr::everything()) %>% 
+  # Rename the P value column without special characters
+  dplyr::rename(P = `Pr(>|t|)`)
 
 # Drop rownames
 rownames(clim_out) <- NULL
+
+# Check it out (visually)
+clim_out
+
+## ------------------------------------------ ##
+                  # Export ----
+## ------------------------------------------ ##
+
+# Generate file names
+(full_name <- paste0("mixed-effect-results_full-mod_", Sys.Date(), ".csv"))
+(clim_name <- paste0("mixed-effect-results_clim-only-mod_", Sys.Date(), ".csv"))
+
+# Export both locally
+write.csv(x = full_out, file = file.path("stats_results", full_name), row.names = F, na = '')
+write.csv(x = clim_out, file = file.path("stats_results", clim_name), row.names = F, na = '')
 
 # End ----
 
