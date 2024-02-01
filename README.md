@@ -53,3 +53,9 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 10. **`synchrony_figures`** - Generates the figures included in this paper. Requires data produced by <u>script 9</u>
 
 11. **`synchrony_supp_figs`** - Generates both the literal supplemental figures included in the Supplementary Materials for this publication and a host of other non-primary figures that may or may not be included in any part of the official publication (supplemental or otherwise). Requires data produced by <u>script 9</u>
+
+### Plant Reproduction Google Drive (_Group Members <u>ONLY</u>_)
+
+- **`plant-repro_gdrive** - Downloads needed data for each script from the group's Shared Google Drive and uploads each script's products to the Drive.
+    - Note this is meant as a convenience for _working group members only_ as it requires access to the group's private Shared Google Drive
+    - For those with Drive access, it enables "skipping" earlier scripts by downloading the version of pre-requisite data from the Drive rather than re-generating them locally
