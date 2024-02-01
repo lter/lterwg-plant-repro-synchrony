@@ -12,7 +12,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, supportR)
+librarian::shelf(tidyverse, supportR)
 
 # Clear environment
 rm(list = ls())
