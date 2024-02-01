@@ -52,13 +52,30 @@ fullmod <- lmerTest::lmer(r.spearman ~ scale(AET) + scale(CWD_log) + scale(Trait
 # Check model summary
 summary(fullmod)
 
+# Strip out the summary table
+full_out <- as.data.frame(summary(fullmod)$coefficients) %>% 
+  # Get the term into a real column (rather than row names)
+  dplyr::mutate(Term = rownames(.),
+                .before = dplyr::everything())
+
+# Drop rownames
+rownames(full_out) <- NULL
+
 # Fit climate variables only mod
-climateonlymod <- lmer(r.spearman ~ (AET) + (CWD_log) + (1|climatesite) + (1|speciespair),
+climateonlymod <- lmerTest::lmer(r.spearman ~ (AET) + (CWD_log) + (1|climatesite) + (1|speciespair),
                        data = pc_clim_sync_df_climsite)
 
 # Check that model's summary
 summary(climateonlymod)
 
+# Strip out the summary table
+clim_out <- as.data.frame(summary(climateonlymod)$coefficients) %>% 
+  # Get the term into a real column (rather than row names)
+  dplyr::mutate(Term = rownames(.),
+                .before = dplyr::everything())
 
+# Drop rownames
+rownames(clim_out) <- NULL
 
+# End ----
 
