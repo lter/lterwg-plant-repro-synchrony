@@ -51,7 +51,3 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 10. **`synchrony_figures`** - Generates the figures included in this paper. Requires data produced by <u>script 9</u>
 
 11. **`synchrony_supp_figs`** - Generates both the literal supplemental figures included in the Supplementary Materials for this publication and a host of other non-primary figures that may or may not be included in any part of the official publication (supplemental or otherwise). Requires data produced by <u>script 9</u>
-
-### Ancillary
-
-- **`synchrony_explore`** - Creates exploratory visuals that are not necessarily publication quality nor necessarily of interest for this publication. Requires data produced by <u>script 9</u>
