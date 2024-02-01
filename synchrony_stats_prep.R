@@ -292,8 +292,8 @@ sync_df <- merge_cor %>%
   dplyr::distinct()
 
 # Calculate variant of Jaccard's distance for the following traits
-names(sync_df[,10:21])
-sync_df$TraitSimilarityJaccardVariant <- rowSums(sync_df[,10:21]) / 12
+names(sync_df[,7:18])
+sync_df$TraitSimilarityJaccardVariant <- rowSums(sync_df[,7:18]) / 12
 
 # Take a look at this object
 dplyr::glimpse(sync_df)
