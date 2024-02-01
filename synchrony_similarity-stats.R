@@ -12,48 +12,28 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, RRPP)
+librarian::shelf(tidyverse, RRPP)
 
 # Clear environment
 rm(list = ls())
 
-# Identify names of files this script requires
-sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-
-# Identify links of relevant Drive folders
-sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-
-# Identify relevant data from those folders
-## List out all CSVs in all folders
-(wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file)))
-
-# Create folder to download files into
+# Create needed local folders
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 dir.create(path = file.path("stats_results"), showWarnings = F)
 
-# Download files into that folder
-purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("tidy_data", .y),
-                                                overwrite = T))
-
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("tidy_data", sync_file))
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv"))
 
 # Glimpse it
 dplyr::glimpse(sync_df)
-
-# Clean up environment
-rm(list = setdiff(x = ls(), y = "sync_df"))
 
 ## ------------------------------------------ ##
             # "Global" Analysis ----
 ## ------------------------------------------ ##
 
 # Fit model
-glob_fit <- RRPP::lm.rrpp(r.spearman ~ TraitSimilarityJaccardVariant, iter = 999, data = sync_df)
+glob_fit <- RRPP::lm.rrpp(r.spearman ~ TraitSimilarityJaccardVariant, 
+                          iter = 999, data = sync_df)
 
 # Extract ANOVA table
 glob_aov <- as.data.frame(anova(glob_fit)$table) %>%
@@ -114,11 +94,5 @@ stat_out <- dplyr::bind_rows(glob_aov, site_aov) %>%
 
 # Save locally
 write.csv(x = stat_out, file = file.path("stats_results", file_name), row.names = F, na = '')
-
-# Identify Drive destination
-stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
-
-# And upload to Drive
-googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
 
 # End ----
