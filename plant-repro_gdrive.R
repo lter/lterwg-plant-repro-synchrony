@@ -26,6 +26,7 @@ dir.create(path = file.path("tidy_data"), showWarnings = F)
 dir.create(path = file.path("stats_results"), showWarnings = F)
 dir.create(path = file.path("figure_data"), showWarnings = F)
 dir.create(path = file.path("table_data"), showWarnings = F)
+dir.create(path = file.path("map_data"), showWarnings = F)
 
 ## ------------------------------------------ ##
           # 1 - Statistics Prep ----
@@ -365,6 +366,49 @@ for(file in table_outs){
 rm(list = ls())
 
 ## ------------------------------------------ ##
+                # 8 - Site Map ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_map.R"
+
+# Identify pre-requisite files to map creation
+(map_needs <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wo2xocmHx0isWwp3siX85rTFB9TvfnNx")) %>%
+   # Filter to only desired files
+   dplyr::filter(name %in% c("lter_site_coordinates.csv", "gblulcgeo20.tif")))
+
+# Download them
+## Note this takes longer than other downloads because the .tif is a big file
+purrr::walk2(.x = map_needs$id, .y = map_needs$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("map_data", .y),
+                                                overwrite = T))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+          # Upload
+## -------------------------- ##
+## Run *after* "synchrony_map.R"
+
+# Identify all figure outputs
+fig_outs <- dir(path = file.path("synchrony_figure_files"))
+
+# Winnow to just the map
+map_out <- fig_outs[stringr::str_detect(string = fig_outs, pattern = "_map.png")]
+
+# Upload to Google Drive
+for(map in map_out){
+  googledrive::drive_upload(media = file.path("synchrony_figure_files", map),
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wZqCP-axj9KUfAaiPJsTamc03zsgngCY"),
+                            overwrite = T) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
 # 4 - x ----
 ## ------------------------------------------ ##
 ## -------------------------- ##
@@ -394,7 +438,6 @@ rm(list = ls())
 
 # Clear environment
 rm(list = ls())
-
 
 
 

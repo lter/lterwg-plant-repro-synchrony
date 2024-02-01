@@ -11,7 +11,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, sf, maps, terra, njlyon0/supportR, cowplot)
+librarian::shelf(tidyverse, sf, maps, terra, njlyon0/supportR, cowplot)
 
 # Clear environment
 rm(list = ls())
@@ -21,28 +21,6 @@ gc()
 
 # Create a folder to store necessary files (if it doesn't already exist)
 dir.create(path = file.path("map_data"), showWarnings = F)
-
-# Identify names of files this script requires
-coord_file <- "lter_site_coordinates.csv"
-landcover_file <- "gblulcgeo20.tif"
-
-# Check whether we already have the files
-(ready_files <- dir(path = file.path("map_data")))
-
-# Identify the files in our desired Drive folder
-(map_files <- googledrive::drive_ls(googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wo2xocmHx0isWwp3siX85rTFB9TvfnNx")) %>%
-  # Filter to only desired files
-  dplyr::filter(name %in% c(coord_file, landcover_file)) %>%
-  # And further remove any files we already have downloaded locally
-    ## Really want to avoid re-downloading the .tif if at all possible
-  dplyr::filter(!name %in% ready_files))
-
-# Download files we don't already have into the folder we have for them
-purrr::walk2(.x = map_files$id, 
-             .y = map_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("map_data", .y),
-                                                overwrite = T))
 
 # Gather up some needed plotting aesthetics
 # Site palette
@@ -95,6 +73,7 @@ plot(lc_v2B, axes = T)
 ## 21: wooded tundra
 
 # Coerce the raster into a dataframe with one row per XY coordinate
+## Note this step takes a minute to complete
 lc_v3 <- as.data.frame(lc_v2, xy = T) %>%
   # Retain only true content pixels
   dplyr::filter(gblulcgeo20 != 0)
@@ -143,11 +122,6 @@ map_name <- "sync_fig1C_map.png"
 # Save locally
 ggsave(filename = file.path("synchrony_figure_files", map_name),
        plot = last_plot(), width = 6, height = 6, units = "in", dpi = 420)
-
-# Upload to Google Drive
-googledrive::drive_upload(media = file.path("synchrony_figure_files", map_name),
-                          path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1wZqCP-axj9KUfAaiPJsTamc03zsgngCY"),
-                          overwrite = T)
 
 # Clean up environment and collect garbage to speed R up going forward
 rm(list = ls())
