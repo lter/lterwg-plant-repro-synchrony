@@ -6,6 +6,9 @@
 # PURPOSE
 ## Create publication-quality site map figure
 
+# PRE-REQUISITES
+## The script has no pre-requisite scripts.
+
 ## ------------------------------------------ ##
               # Housekeeping ----
 ## ------------------------------------------ ##

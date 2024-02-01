@@ -7,6 +7,9 @@
 ## Synchrony analysis requires a significant amount of data wrangling.
 ## This script accomplishes all of that so the analysis script can be more streamlined.
 
+# PRE-REQUISITES
+## The script has no pre-requisite scripts. Simply download the needed data from FigShare
+
 ## ------------------------------------------ ##
               # Housekeeping ----
 ## ------------------------------------------ ##

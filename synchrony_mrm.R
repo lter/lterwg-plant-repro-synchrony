@@ -8,6 +8,10 @@
 ## analyze effect(s) of various traits on cross-species synchrony
 ## Also does sensitivity analyses by excluding one site and re-running all MRMs
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_stats_prep.R`
+
 ## ------------------------------------------ ##
                 # Housekeeping ----
 ## ------------------------------------------ ##

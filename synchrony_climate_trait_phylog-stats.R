@@ -6,6 +6,10 @@
 # PURPOSE
 ## Performs linear mixed effects model of synchrony as related to trait similarity, phylogenetic relatedness, and climate variables. 
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_stats_prep.R`
+
 ## ------------------------------------------ ##
                 # Housekeeping ----
 ## ------------------------------------------ ##

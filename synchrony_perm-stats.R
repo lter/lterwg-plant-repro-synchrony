@@ -7,6 +7,10 @@
 ## Performs statistical analysis on permuted vs. actual correlations
 ## As of 10/23/23 this corresponds to the data presented in figures 2 and 3A
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_stats_prep.R`
+
 ## ------------------------------------------ ##
                 # Housekeeping ----
 ## ------------------------------------------ ##

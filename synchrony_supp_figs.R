@@ -6,6 +6,10 @@
 # PURPOSE
 ## Create publication-quality figures for the synchrony paper
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_vis_prep.R`
+
 ## ------------------------------------------ ##
                 # Housekeeping ----
 ## ------------------------------------------ ##

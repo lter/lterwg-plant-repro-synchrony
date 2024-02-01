@@ -7,6 +7,10 @@
 ## Using permutation analysis of variance (perANOVA)
 ## analyze effects of trait levels (separately) on synchrony (i.e., correlation)
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_stats_prep.R`
+
 ## ------------------------------------------ ##
               # Housekeeping ----
 ## ------------------------------------------ ##

@@ -7,6 +7,14 @@
 ## Perform pre-visualization prep
 ## Several tidy data files + stats results files need to be combined for to make desired figures
 
+# PRE-REQUISITES
+## The following script(s) must be run--in order--for this script to work as intended
+## 1. Run `synchrony_stats_prep.R`
+## 2. Run `synchrony_mrm.R`
+## 3. Run `synchrony_perm-stats.R`
+## 4. Run `synchrony_anova.R`
+## 5. Run `synchrony_similarity-stats.R`
+
 ## ------------------------------------------ ##
                 # Housekeeping ----
 ## ------------------------------------------ ##
