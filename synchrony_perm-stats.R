@@ -12,42 +12,21 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, RRPP)
+librarian::shelf(tidyverse, RRPP)
 
 # Clear environment
 rm(list = ls())
 
-# Identify names of files this script requires
-sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-perm_file <- "permutation_corr_unsummarized.csv" # correlation permutation data
-
-# Identify links of relevant Drive folders
-sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-gen_data_folder <- googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")
-
-# Identify relevant data from those folders
-## List out all CSVs in all folders
-(wanted_files <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    dplyr::bind_rows(googledrive::drive_ls(path = gen_data_folder, type = "csv")) %>%
-    ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, perm_file)))
-
-# Create folder to download files into
+# Create needed folders
 dir.create(path = file.path("stats_results"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
-
-# Download files into that folder
-purrr::walk2(.x = wanted_files$id, .y = wanted_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("tidy_data", .y),
-                                                overwrite = T))
 
 ## ------------------------------------------ ##
               # Data Wrangling ----
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv")) %>%
   # Pare down to needed columns
   dplyr::select(lter, Plot.ID, Species1, Species2, r.spearman) %>%
   # Drop non-unique rows (shouldn't be any but better safe than sorry)
@@ -59,7 +38,7 @@ sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in permutations of correlations
-perm_df <- read.csv(file = file.path("tidy_data", perm_file)) %>%
+perm_df <- read.csv(file = file.path("tidy_data", "permutation_corr_unsummarized.csv")) %>%
   # Cut off below overlap threshold
   dplyr::filter(overlap > 9) %>%
   # Filter to only desired LTERs
@@ -146,16 +125,11 @@ stat_out <- dplyr::bind_rows(glob_aov, site_aov) %>%
   # Rename the P value column
   dplyr::rename(P = `Pr(>F)`)
 
-# Generate time-stamped filename
+# Generate time-stamped filename 
 (file_name <- paste0("perm-vs-actual-results_", Sys.Date(), ".csv"))
 
 # Save locally
-write.csv(x = stat_out, file = file.path("stats_results", file_name), row.names = F, na = '')
-
-# Identify Drive destination
-stats_drive <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")
-
-# And upload to Drive
-googledrive::drive_upload(media = file.path("stats_results", file_name), path = stats_drive, overwrite = T)
+write.csv(x = stat_out, row.names = F, na = '',
+          file = file.path("stats_results", file_name))
 
 # End ----
