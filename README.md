@@ -30,7 +30,7 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 ### Analysis
 
-1. **`synchrony_stats-prep`** - Absorb tidied mast seeding data and do pre-statistics preparatory wrangling. Tidying scripts housed in a different repository and will be published on in a different paper
+1. **`synchrony_stats-prep`** - Absorb tidied mast seeding data and do pre-statistics preparatory wrangling. Tidying scripts housed in a different repository and will be published on in a different paper. This script produces the data 'synchrony_pcoa_climate_combination.csv' that is needed in subsequent scripts.
 
 2. **`synchrony_mrm`** - Performs multiple regression on distance matrices (MRM) to assess effect of species' traits on synchrony. Requires data produced by <u>script 1</u>
 
