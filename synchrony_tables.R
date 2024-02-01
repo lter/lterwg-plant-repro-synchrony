@@ -11,45 +11,13 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(googledrive, tidyverse, supportR, rstatix)
+librarian::shelf(tidyverse, supportR, rstatix)
 
 # Clear environment
 rm(list = ls())
 
-# Identify names of files this script requires
-sync_file <- "synchrony_pcoa_climate_combination.csv" # synchrony + climate data
-trait_file <- "pre_ordination_trait_data.csv" # trait data
-full_trait_file <- "LTER_integrated_attributes_USDA_2022-12-14.csv" # complete trait data
-
-# Identify links of relevant Drive folders
-sync_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL")
-att_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1PGaPAkNz1lmvZQMwwthmS-ZjQ97BS2Am")
-
-# Identify relevant data from those folders
-## List out all CSVs in all folders
-wanted_files1 <- googledrive::drive_ls(path = sync_folder, type = "csv") %>%
-    ## Filter to only desired files
-    dplyr::filter(name %in% c(sync_file, trait_file))
-
-## List out all CSVs in all folders
-wanted_files2 <- googledrive::drive_ls(path = att_folder, type = "csv") %>%
-  ## Filter to only desired files
-  dplyr::filter(name %in% c(full_trait_file))
-
-# Combine file IDs
-(wanted_files <- rbind(wanted_files1, wanted_files2))
-
-# Create folder to download files into
+# Create needed local folders
 dir.create(path = file.path("tidy_data"), showWarnings = F)
-
-# Download files into that folder
-purrr::walk2(.x = wanted_files$id, 
-             .y = wanted_files$name,
-             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
-                                                path = file.path("tidy_data", .y),
-                                                overwrite = T))
-
-# Make a folder to export tables to
 dir.create(path = file.path("table_data"), showWarnings = F)
 
 ## ------------------------------------------ ##
@@ -57,7 +25,7 @@ dir.create(path = file.path("table_data"), showWarnings = F)
 ## ------------------------------------------ ##
 
 # Read in synchrony data
-sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
+sync_df <- read.csv(file = file.path("tidy_data", "synchrony_pcoa_climate_combination.csv")) %>%
   # Make a species pair column quickly
   dplyr::mutate(Species_Pair = paste(Species1, Species2, sep = "__"),
                 .before = Species1) %>%
@@ -73,7 +41,7 @@ sync_df <- read.csv(file = file.path("tidy_data", sync_file)) %>%
 dplyr::glimpse(sync_df)
 
 # Read in trait information
-spp_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
+spp_traits <- read.csv(file = file.path("tidy_data", "pre_ordination_trait_data.csv")) %>%
   # Pivot to long format
   tidyr::pivot_longer(cols = -lter:-Species.Name,
                       names_to = "trait", values_to = "trait_value") %>%
@@ -146,8 +114,7 @@ var_trait_num <- sync_df %>%
   # Count number of varying traits
   dplyr::group_by(lter) %>%
   dplyr::summarize(variable_trait_ct = dplyr::n()) %>%
-  dplyr::ungroup() %>%
-  glimpse()
+  dplyr::ungroup()
 
 # Check that out
 var_trait_num
@@ -157,9 +124,9 @@ plot_table <- sync_df %>%
   # Calculate desired metrics with sites
   dplyr::group_by(lter) %>%
   dplyr::summarize(plot_ct = length(unique(Plot.ID)),
-                   mean_CWD = round(mean(CWD, na.rm = T), digits = 1),
-                   min_CWD = round(min(CWD, na.rm = T), digits = 1),
-                   max_CWD = round(max(CWD, na.rm = T), digits = 1),
+                   mean_CWD = round(mean(CWD_log, na.rm = T), digits = 1),
+                   min_CWD = round(min(CWD_log, na.rm = T), digits = 1),
+                   max_CWD = round(max(CWD_log, na.rm = T), digits = 1),
                    mean_overlap = round(mean(overlap, na.rm = T), digits = 1),
                    max_overlap = max(overlap, na.rm = T) ) %>%
   dplyr::ungroup() %>%
@@ -196,7 +163,6 @@ for(trait in trait_vals){
   # Export locally
   write.csv(trait_tab, row.names = F, na = '', 
             file = file.path("table_data", paste0(trait, "_summary_table.csv")))
-  
 }
 
 ## ------------------------------------------ ##
@@ -206,11 +172,11 @@ for(trait in trait_vals){
 # ------------------------------- Data Prep ------------------------------------
 
 # Read in the pre ordination trait data
-pre_ord_traits <- read.csv(file = file.path("tidy_data", trait_file)) %>%
+pre_ord_traits <- read.csv(file = file.path("tidy_data", "pre_ordination_trait_data.csv")) %>%
   mutate(Species.Name = gsub("\\."," ", Species.Name)) 
 
 # Read in the full trait data
-all_traits <- read.csv(file = file.path("tidy_data", full_trait_file)) 
+all_traits <- read.csv(file = file.path("tidy_data", "LTER_integrated_attributes_USDA_2022-12-14.csv")) 
 
 # Grab the exact seed mass values 
 seed_mass <- all_traits %>%
@@ -353,20 +319,5 @@ qual_stats_altogether <- overall_qual_stats_v2 %>%
 
 # Exporting qualitative stats
 write.csv(qual_stats_altogether, file.path("table_data", "Table_S2_qual_trait_stats.csv"), row.names = FALSE)
-
-## ------------------------------------------ ##
-                  # Export ----
-## ------------------------------------------ ##
-
-# Identify folder to export plots to
-table_folder <- googledrive::as_id("https://drive.google.com/drive/u/0/folders/1ReUBqmiZK2gwGePNt9VN0qcfcLiwZ_MZ")
-
-# Identify tables that we have created
-table <- dir(path = file.path("table_data"))
-
-# Upload each to the Drive (skipping the map if it's there)
-for(file in table){
-  googledrive::drive_upload(media = file.path("table_data", file),
-                            path = table_folder, overwrite = T) }
 
 # End ----

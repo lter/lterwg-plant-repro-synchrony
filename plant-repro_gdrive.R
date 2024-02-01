@@ -24,6 +24,8 @@ rm(list = ls())
 dir.create(path = file.path("source_data"), showWarnings = F)
 dir.create(path = file.path("tidy_data"), showWarnings = F)
 dir.create(path = file.path("stats_results"), showWarnings = F)
+dir.create(path = file.path("figure_data"), showWarnings = F)
+dir.create(path = file.path("table_data"), showWarnings = F)
 
 ## ------------------------------------------ ##
           # 1 - Statistics Prep ----
@@ -312,6 +314,52 @@ mix_outs <- stat_outs[stringr::str_detect(string = stat_outs, pattern = "mixed-e
 for(file in mix_outs){
   googledrive::drive_upload(media = file.path("stats_results", file), overwrite = T,
                             path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1cRJkEcoy81Keed6KWlj2FlOq3V_SnuPH")) }
+
+# Clear environment
+rm(list = ls())
+
+## ------------------------------------------ ##
+            # 7 - Summary Tables ----
+## ------------------------------------------ ##
+## -------------------------- ##
+          # Download
+## -------------------------- ##
+## Run *before* "synchrony_tables.R"
+
+# Identify needed data files
+data_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1c7M1oMaCtHy-IQIJVcuyrKvwlpryM2vL"), type = "csv") %>%
+  dplyr::filter(name %in% c("synchrony_pcoa_climate_combination.csv", "pre_ordination_trait_data.csv"))
+
+# Identify full trait file
+full_trait <-  googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1PGaPAkNz1lmvZQMwwthmS-ZjQ97BS2Am"), type = "csv") %>%
+  dplyr::filter(name %in% c("LTER_integrated_attributes_USDA_2022-12-14.csv"))
+
+# Combine all needed files into one object
+(table_needs <- data_files %>% 
+  dplyr::bind_rows(full_trait) )
+
+# Download them
+purrr::walk2(.x = table_needs$id,  .y = table_needs$name,
+             .f = ~ googledrive::drive_download(file = googledrive::as_id(.x), 
+                                                path = file.path("tidy_data", .y),
+                                                overwrite = T))
+
+# Clear environment
+rm(list = ls())
+
+## -------------------------- ##
+# Upload
+## -------------------------- ##
+## Run *after* "synchrony_tables.R"
+
+# Identify produced files
+(table_outs <- dir(path = file.path("table_data")))
+
+# Upload each to the Drive (skipping the map if it's there)
+for(file in table_outs){
+  googledrive::drive_upload(media = file.path("table_data", file),
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1ReUBqmiZK2gwGePNt9VN0qcfcLiwZ_MZ"), overwrite = T) }
+# Upload each file
 
 # Clear environment
 rm(list = ls())
