@@ -28,6 +28,7 @@ dir.create(path = file.path("table_data"), showWarnings = F)
 dir.create(path = file.path("map_data"), showWarnings = F)
 dir.create(path = file.path("figure_data"), showWarnings = F)
 dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
+dir.create(path = file.path("synchrony_supp_figures"), showWarnings = F)
 
 ## ------------------------------------------ ##
           # 1 - Statistics Prep ----
@@ -511,25 +512,37 @@ rm(list = ls())
 ## -------------------------- ##
 ## Run *before* "synchrony_supp_figs.R"
 
-# Identify needed data files
+# Identify needed pre-wrangled-for-visualization files
+vis_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1tN5-GhlIWuEG7NKlaoVrUWAiLMG7agY2"), type = "csv")
 
+# Identify time series files
+series_files <- googledrive::drive_ls(path = googledrive::as_id("https://drive.google.com/drive/folders/1aPdQBNlrmyWKtVkcCzY0jBGnYNHnwpeE")) %>%
+  dplyr::filter(name %in% c("series_andrews.csv", "series_bonanza.csv"))
 
 # Combine all needed files into one object
-
+(fig_needs <- vis_files %>% 
+    dplyr::bind_rows(series_files) )
 
 # Download them
+purrr::walk2(.x = fig_needs$id, .y = fig_needs$name,
+             .f = ~ googledrive::drive_download(file = .x, overwrite = T,
+                                                path = file.path("figure_data", .y)))
 
 # Clear environment
 rm(list = ls())
 
 ## -------------------------- ##
-# Upload
+          # Upload
 ## -------------------------- ##
 ## Run *after* "synchrony_supp_figs.R"
 
-# Identify produced files
+# Identify supplemental figures
+suppfig_outs <- dir(path = file.path("synchrony_supp_figures"))
 
-# Upload each file
+# Upload each to the Drive (skipping giant files if there)
+for(bonus in suppfig_outs){
+  googledrive::drive_upload(media = file.path("synchrony_supp_figures", bonus),
+                            path = googledrive::as_id("https://drive.google.com/drive/u/0/folders/1YsDZwsav5saLHaYrPis4OvSGAd1_Q_C7"), overwrite = T) }
 
 # Clear environment
 rm(list = ls())
