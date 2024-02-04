@@ -32,19 +32,19 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 1. **`synchrony_stats-prep`** - Absorb tidied mast seeding data and do pre-statistics preparatory wrangling. Tidying scripts housed in a different repository and will be published on in a different paper. This script produces the data 'synchrony_pcoa_climate_combination.csv' that is needed in subsequent scripts.
 
-2. **`synchrony_mrm`** - Performs multiple regression on distance matrices (MRM) to assess effect of species' traits on synchrony. Requires data produced by <u>script 1</u>
+2. **`synchrony_mrm`** - Performs multiple regression on distance matrices (MRM) to assess effect of species' traits on synchrony. Requires data produced by <u>script 1</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-3. **`synchrony_perm-stats`** - Analyzes difference between observed and permuted correlations. Requires data produced by <u>script 1</u>
+3. **`synchrony_perm-stats`** - Analyzes difference between observed and permuted correlations. Requires data produced by <u>script 1</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-4. **`synchrony_anova`** - Performs permutation analysis of variance (perANOVA) to assess the effect of _each trait_ (<u>separately</u>) on synchrony. Requires data produced by <u>script 1</u>
+4. **`synchrony_anova`** - Performs permutation analysis of variance (perANOVA) to assess the effect of _each trait_ (<u>separately</u>) on synchrony. Requires data produced by <u>script 1</u>  (use 'synchrony_pcoa_climate_combination.csv').
 
-5. **`synchrony_similarity-stats`** - Performs perANOVA on the 'Jaccard variant' of trait similarity. "Variant" because the authors have made some tweaks to the calculation of this metric so it is similar to Jaccard but not technically the same thing. Requires data produced by <u>script 1</u>
+5. **`synchrony_similarity-stats`** - Performs perANOVA on the 'Jaccard variant' of trait similarity. "Variant" because the authors have made some tweaks to the calculation of this metric so it is similar to Jaccard but not technically the same thing. Requires data produced by <u>script 1</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-6. **`synchrony_climate-trait-phylog-stats`** - Performs linear mixed effects model of synchrony as related to trait similarity, phylogenetic relatedness, and climate variables. Requires data produced by <u>script 1</u>
+6. **`synchrony_climate-trait-phylog-stats`** - Performs linear mixed effects model of synchrony as related to trait similarity, phylogenetic relatedness, and climate variables. Requires data produced by <u>script 1</u> (use 'synchrony_pcoa_climate_combination.csv').
 
 ### Summary Calculation & Visualization
 
-7. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data produced by <u>script 1</u>
+7. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data produced by <u>script 1</u>  (use 'synchrony_pcoa_climate_combination.csv').
 
 8. **`synchrony_map`** - Makes the map of all sites included in this paper (plus a forest cover layer)
 
