@@ -20,7 +20,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(tidyverse, supportR, magrittr)
+librarian::shelf(tidyverse, supportR, magrittr, multcompView)
 
 # Clear environment
 rm(list = ls())
