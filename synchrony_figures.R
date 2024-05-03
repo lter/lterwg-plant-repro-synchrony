@@ -15,7 +15,7 @@
 ## ------------------------------------------ ##
 # Load libraries
 # install.packages("librarian")
-librarian::shelf(tidyverse, see, vegan, supportR, cowplot, magrittr)
+librarian::shelf(tidyverse, see, vegan, njlyon0/supportR, cowplot, magrittr)
 
 # Create needed local folder(s)
 dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
@@ -325,12 +325,19 @@ trait_mds <- vegan::metaMDS(comm = spp_traits[-c(1:2)], distance = "jaccard",
 # Identify which traits are driving the variation
 trait_fit <- vegan::envfit(ord = trait_mds, env = spp_traits[-c(1:2)], permutations = 999)
 
+# Give warning if not using right version of `supportR`
+if(packageVersion("supportR") < '1.3.0.900'){
+  warning("Label text size arguments only supported in version 1.3.0.900 or later. \nRun the following code to update your version:")
+  print("devtools::install_github('njlyon0/supportR', force = T)")
+  message("Note you may need to re-start your R session for the change to take effect") }
+
 # Make (and export) ordination
 png(file = file.path("synchrony_figure_files", "sync_fig4A_trait_nms.png"), 
-     width = 750, height = 550)
+     width = 800, height = 600)
 supportR::nms_ord(mod = trait_mds, groupcol = spp_traits$lter, leg_pos = "bottomleft",
                   colors = site_palette[sort(names(site_palette))],
-                  pt_size = 2.5, pt_alpha = 0.5)
+                  pt_size = 2.5, pt_alpha = 0.5,
+                  lab_text_size = 1.5, axis_text_size = 1.25)
 graphics::plot(x = trait_fit, col = "black", cex = 1.2)
 dev.off()
 
