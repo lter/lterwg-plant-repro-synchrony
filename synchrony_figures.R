@@ -353,17 +353,17 @@ ggplot(sync_df, aes(x = TraitSimilarityJaccardVariant, y = r.spearman)) +
   # Horizontal line at 0
   geom_hline(yintercept = 0, linetype = 3, linewidth = 1) +
   # Actual data points
-  geom_point(aes(color = lter), alpha = 0.4, pch = sync_df$solid_shapes) +
+  geom_point(aes(color = lter, shape = lter), alpha = 0.4, pch = sync_df$solid_shapes) +
   ## Semi-duplicate geom_smooths / LTER are necessary to make legend pretty
-  geom_smooth(aes(color = lter, fill = lter), method = "lm", formula = "y ~ x", 
-              alpha = 0.2, show.legend = F) +
-  geom_smooth(aes(color = lter), se = F, method = "lm", formula = "y ~ x") +
+  # geom_smooth(aes(color = lter, fill = lter), method = "lm", formula = "y ~ x", 
+  #             alpha = 0.2, show.legend = F) +
+  # geom_smooth(aes(color = lter), se = F, method = "lm", formula = "y ~ x") +
   geom_smooth(color = "black", fill = "gray82", method = "lm", formula = "y ~ x") +
   # Customize colors, fills, and plot formatting
   labs(x = "Trait Similarity", y = "Cross-Species Synchrony") +
   scale_color_manual(values = site_palette) +
   scale_fill_manual(values = site_palette) +
-  scale_shape_manual(values = shp_palette) +
+  # scale_shape_manual(values = shp_palette) +
   guides(fill = 'none') +
   supportR::theme_lyon(title_size = 14, text_size = 11) +
   theme(legend.background = element_blank(),
