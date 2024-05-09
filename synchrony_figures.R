@@ -371,7 +371,7 @@ ggplot(sync_df, aes(x = TraitSimilarityJaccardVariant, y = r.spearman)) +
         legend.position = "right")
 
 # Export locally
-ggsave(filename = file.path("synchrony_figure_files", "sync_fig4B_trait_sim_by_site.png"),
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig4B_trait_sim.png"),
        plot = last_plot(), width = 6, height = 5, units = "in", dpi = 720)
 
 # Clean up  environment
