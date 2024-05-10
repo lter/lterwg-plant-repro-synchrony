@@ -250,8 +250,8 @@ rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
 ## ------------------------------------------ ##
       # Figure 3 - Climate & Site ----
 ## ------------------------------------------ ##
-# 4a = Synchrony ~ log water deficit
-# 4b = site ~ synchrony
+# 3a = site ~ synchrony
+# 3b = Synchrony ~ log water deficit
 
 # Make a summarized dataframe for figure 4A
 fig3_cwd_df <- supportR::summary_table(data = sync_df, groups = c("lter", "CWD_log"),
@@ -310,6 +310,62 @@ cowplot::plot_grid(fig3_sites, fig3_cwd, labels = "AUTO", nrow = 1, ncol = 2,
 # Export this
 ggsave(filename = file.path("synchrony_figure_files", "sync_fig3_climate_plus_site_var.png"),
        plot = last_plot(), width = 8, height = 4, units = "in", dpi = 720)
+
+# Clean up  environment
+rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
+
+## ------------------------------------------ ##
+  # Figure 3 Variant - Climate PREDICTED ----
+## ------------------------------------------ ##
+# 3b = Synchrony ~ log water deficit
+
+# Load needed libraries
+librarian::shelf(lmerTest, ggeffects)
+
+# Fit model
+cwd_mod <- lmerTest::lmer(r.spearman ~ (AET) + (CWD_log) + (1|climatesite) + (1|speciespair), data = sync_df)
+
+# Get predicted values for logCWD
+mod_predicts <- ggeffects::ggpredict(model = cwd_mod, terms = c("CWD_log"),
+                                     type = "random")
+
+# Make a summarized dataframe of the predicted values
+fig3_cwd_df <- supportR::summary_table(data = sync_df, groups = c("lter", "CWD_log"),
+                                       response = "r.spearman", drop_na = T)
+
+# Create climate panel
+fig3_cwd <- ggplot() +
+  # Horizontal line at 0
+  geom_hline(yintercept = 0, linetype = 3, linewidth = 1) +
+  # Add predicted and observed best-fit lines
+  geom_smooth(data = mod_predicts, mapping = aes(x = x, y = predicted),
+              color = "#9a8c98", fill = "gray82", linetype = 2,
+              method = "lm", formula = "y ~ x") +
+  geom_smooth(data = sync_df, mapping = aes(x = CWD_log, y = r.spearman),
+              color = "black", fill = "gray82", linetype = 1,
+              method = "lm", formula = "y ~ x") +
+  # Add un-averaged points
+  geom_point(data = sync_df, mapping = aes(x = CWD_log, y = r.spearman, color = lter),
+             alpha = 0.3, pch = sync_df$solid_shapes) +
+  # Add averaged points with SD bars
+  geom_errorbar(data = fig3_cwd_df, aes(x = CWD_log, y = mean, 
+                                        ymax = mean + std_dev, 
+                                        ymin = mean - std_dev), width = 0) +
+  geom_point(data = fig3_cwd_df, aes(x = CWD_log, y = mean, fill = lter, 
+                                     shape = lter), size = 3) +
+  scale_shape_manual(values = shp_palette) +
+  # Customize colors, fills, and plot formatting
+  labs(x = "log(Climate Water Deficit [mm])", y = "Cross-Species Synchrony") +
+  ylim(-0.75, 1.1) +
+  scale_color_manual(values = site_palette) +
+  scale_fill_manual(values = site_palette) +
+  supportR::theme_lyon(title_size = 14, text_size = 11) +
+  theme(legend.background = element_blank(),
+        legend.position = "right"); fig3_cwd
+
+# Export this
+ggsave(filename = file.path("synchrony_figure_files", "sync_fig3-var_climate_pred_vs_obs.png"),
+       plot = last_plot(), width = 6, height = 6, units = "in", dpi = 720)
 
 # Clean up  environment
 rm(list = setdiff(ls(), c(keep_objects, "keep_objects")))
