@@ -22,7 +22,7 @@ dir.create(path = file.path("synchrony_figure_files"), showWarnings = F)
 
 # Run the entirety of the preparation script (if not already done so)
 ## Takes ~2 minutes to complete
-source("synchrony_vis-prep.R")
+source("09_synchrony_vis-prep.R")
 
 # Clear environment
 rm(list = ls())
