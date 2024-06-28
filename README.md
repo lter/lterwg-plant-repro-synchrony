@@ -32,7 +32,7 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 1. **`synchrony_mrm`** - Performs multiple regression on distance matrices (MRM) to assess effect of species' traits on synchrony. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-2. **`synchrony_perm-stats`** - Analyzes difference between observed and permuted correlations. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv').
+2. **`synchrony_perm-stats`** - Analyzes difference between observed and permuted correlations. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv' and 'perm_corr_unsummarized.csv').
 
 3. **`synchrony_anova`** - Performs permutation analysis of variance (perANOVA) to assess the effect of _each trait_ (<u>separately</u>) on synchrony. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv').
 
@@ -44,7 +44,7 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 6. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-7. **`synchrony_map`** - Makes the map of all sites included in this paper (plus [a forest cover layer](https://lpdaac.usgs.gov/products/mcd12q1v006/))
+7. **`synchrony_map`** - Makes the map of all sites included in this paper. Requires a site coordinate CSV and [a forest cover raster](https://lpdaac.usgs.gov/products/mcd12q1v006/)
 
 8. **`synchrony_vis-prep`** - Wrangles tidy data and statistical results files in preparation for use in creating downstream visualizations. Requires data produced by <u>all preceding scripts</u>
 
