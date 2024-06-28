@@ -44,7 +44,7 @@ Mast seeding, the synchronous and highly variable production of seed crops in pe
 
 6. **`synchrony_tables`** - Creates the summary tables included in the paper. This makes it easier to update in the manuscript than manually re-summarizing. Requires data archived on <u>Figshare</u> (use 'synchrony_pcoa_climate_combination.csv').
 
-7. **`synchrony_map`** - Makes the map of all sites included in this paper (plus a forest cover layer)
+7. **`synchrony_map`** - Makes the map of all sites included in this paper (plus [a forest cover layer](https://lpdaac.usgs.gov/products/mcd12q1v006/))
 
 8. **`synchrony_vis-prep`** - Wrangles tidy data and statistical results files in preparation for use in creating downstream visualizations. Requires data produced by <u>all preceding scripts</u>
 
