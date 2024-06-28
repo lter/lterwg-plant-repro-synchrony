@@ -737,7 +737,7 @@ for(exclude_site in unique(sync_df$lter)) {
      # Sensitivity Export - Full Data ----
 ## ------------------------------------------ ##
 # Process the big list we're left with
-sens_df <- purrr::list_rbind(x = sens_out) %>%
+sens_df <- purrr::list_rbind(x = sens_out)
 
 # Check this out
 dplyr::glimpse(sens_df)
