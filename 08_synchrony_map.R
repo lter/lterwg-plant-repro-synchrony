@@ -64,17 +64,14 @@ plot(lulc_crop, axes = T)
 
 # Keep only tree categories
 lc_v2 <- (lulc_crop %in% c(11:15)) # True forest only
-lc_v2B <- (lulc_crop %in% c(6, 11:15, 18, 21)) # Forest + wooded areas
+
+# Demo plot
 plot(lc_v2, axes = T)
-plot(lc_v2B, axes = T)
-## 6: cropland/woodland mosaic
 ## 11: deciduous broadleaf forest
 ## 12: deciduous needleleaf forest
 ## 13: evergreen broadleaf forest
 ## 14: evergreen needleleaf forest
 ## 15: mixed forest
-## 18: wooded wetland
-## 21: wooded tundra
 
 # Coerce the raster into a dataframe with one row per XY coordinate
 ## Note this step takes a minute to complete
