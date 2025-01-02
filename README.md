@@ -4,25 +4,8 @@
 
 ## Authors
 
-Jalene M. LaMontagne, Department of Biological Sciences, DePaul University, Chicago, IL. USA;
-David F. Greene, Department of Forestry, Fire, and Range Management. Cal Poly Humboldt, Arcata, CA, USA;
-E. Penelope Holland, Department of Biology, University of York, York, UK;
-Jill F. Johnstone, Institute of Arctic Biology, University of Alaska Fairbanks, Fairbanks, AK, USA;
-Mark Schulze, H.J. Andrews Experimental Forest, Oregon State University; Blue River, OR, USA;
-Jess K. Zimmerman, Department of Environmental Sciences, University of Puerto Rico, San Juan, PR, USA;
-Nicholas J. Lyon, Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA;
-Angel Chen, Long Term Ecological Research Network Office. National Center for Ecological Analysis and Synthesis, University of California Santa Barbara, Santa Barbara, CA, USA;
-Tom E.X. Miller, Department of BioSciences, Rice University, Houston, TX USA;
-Katherine M. Nigro, ORISE Postdoctoral fellow, Rocky Mountain Research Station, USDA Forest Service, Fort Collins, CO, USA;
-Rebecca S. Snell, Department of Environmental and Plant Biology, Ohio University, Athens, OH, USA;
-Jessica H. Barton, Department of Biological Sciences, DePaul University, Chicago, IL. USA;
-V. Bala Chaudhary, Environmental Studies Department, Dartmouth College, Hanover, NH, USA;
-Natalie L. Cleavitt, Department of Natural Resources and the Environment, Cornell University, Ithaca, NY, USA;
-Elizabeth E. Crone, Department of Evolution & Ecology, University of California, Davis CA 95618 USA;
-Walter D. Koenig, Hastings Reservation, University of California Berkeley, Carmel Valley, CA, USA;
-Diana Macias, Department of Environmental Science, Policy, and Management. University of California Berkeley, Berkeley, CA, USA;
-Ian S. Pearse, U.S. Geological Survey, Fort Collins Science Center, Fort Collins, CO, USA;
-Miranda D. Redmond, Department of Environmental Science, Policy, and Management. University of California Berkeley, Berkeley, CA, USA
+[Jalene M. LaMontagne](https://orcid.org/0000-0001-7713-8591); David F. Greene; E. Penelope Holland; [Jill F. Johnstone](https://orcid.org/0000-0001-6131-9339); Mark Schulze; Jess K. Zimmerman; [Nicholas J. Lyon](https://orcid.org/0000-0003-3905-1078); [Angel Chen](https://orcid.org/0000-0003-3515-6710); [Tom E.X. Miller](https://orcid.org/0000-0003-3208-6067); [Katherine M. Nigro](https://orcid.org/0000-0001-5852-3814); Rebecca S. Snell; [Jessica H. Barton](https://orcid.org/0000-0002-2016-4278); V. Bala Chaudhary; [Natalie L. Cleavitt](https://orcid.org/0000-0003-0425-2486); Elizabeth E. Crone;
+[Walter D. Koenig](https://orcid.org/0000-0001-6207-1427); Diana Macias; [Ian S. Pearse](https://orcid.org/0000-0001-7098-0495); Miranda D. Redmond
 
 ## Associated Paper Abstract
 
