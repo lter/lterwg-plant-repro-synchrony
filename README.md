@@ -4,8 +4,7 @@
 
 ## Authors
 
-[Jalene M. LaMontagne](https://orcid.org/0000-0001-7713-8591); David F. Greene; E. Penelope Holland; [Jill F. Johnstone](https://orcid.org/0000-0001-6131-9339); Mark Schulze; Jess K. Zimmerman; [Nicholas J. Lyon](https://orcid.org/0000-0003-3905-1078); [Angel Chen](https://orcid.org/0000-0003-3515-6710); [Tom E.X. Miller](https://orcid.org/0000-0003-3208-6067); [Katherine M. Nigro](https://orcid.org/0000-0001-5852-3814); Rebecca S. Snell; [Jessica H. Barton](https://orcid.org/0000-0002-2016-4278); V. Bala Chaudhary; [Natalie L. Cleavitt](https://orcid.org/0000-0003-0425-2486); Elizabeth E. Crone;
-[Walter D. Koenig](https://orcid.org/0000-0001-6207-1427); Diana Macias; [Ian S. Pearse](https://orcid.org/0000-0001-7098-0495); Miranda D. Redmond
+[Jalene M. LaMontagne](https://orcid.org/0000-0001-7713-8591); David F. Greene; E. Penelope Holland; [Jill F. Johnstone](https://orcid.org/0000-0001-6131-9339); Mark Schulze; Jess K. Zimmerman; [Nicholas J. Lyon](https://orcid.org/0000-0003-3905-1078); [Angel Chen](https://orcid.org/0000-0003-3515-6710); [Tom E.X. Miller](https://orcid.org/0000-0003-3208-6067); [Katherine M. Nigro](https://orcid.org/0000-0001-5852-3814); Rebecca S. Snell; [Jessica H. Barton](https://orcid.org/0000-0002-2016-4278); V. Bala Chaudhary; [Natalie L. Cleavitt](https://orcid.org/0000-0003-0425-2486); Elizabeth E. Crone; [Walter D. Koenig](https://orcid.org/0000-0001-6207-1427); Diana Macias; [Ian S. Pearse](https://orcid.org/0000-0001-7098-0495); Miranda D. Redmond
 
 ## Associated Paper Abstract
 
