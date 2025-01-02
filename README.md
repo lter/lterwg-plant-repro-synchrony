@@ -1,5 +1,7 @@
 # [Community Synchrony in Seed Production is Associated With Trait Similarity and Climate Across North America](https://onlinelibrary.wiley.com/doi/ftr/10.1111/ele.14498)
 
+![DOI](https://img.shields.io/badge/DOI-10.1111/ele.14498-blue.svg)
+
 ## Authors
 
 Jalene M. LaMontagne, Department of Biological Sciences, DePaul University, Chicago, IL. USA;
