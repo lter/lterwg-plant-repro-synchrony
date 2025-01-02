@@ -1,4 +1,4 @@
-# Community synchrony in seed production is associated with trait similarity and climate across North America
+# [Community Synchrony in Seed Production is Associated With Trait Similarity and Climate Across North America](https://onlinelibrary.wiley.com/doi/ftr/10.1111/ele.14498)
 
 ## Authors
 
